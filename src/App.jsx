@@ -54,7 +54,7 @@ import MoveHistory from "./components/MoveHistory";
 import ChessTimer from "./components/ChessTimer";
 import GameEndDialog from "./components/GameEndDialog";
 import SettingsDialog from "./components/SettingsDialog";
-import ChessTutorial from "./components/ChessTutorial";
+import ChessTutorial from "./components/tutorial/ChessTutorial";
 import { getThemeByMode } from "./theme";
 import { Chess } from "chess.js";
 
