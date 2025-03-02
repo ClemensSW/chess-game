@@ -1,5 +1,5 @@
 // src/components/tutorial/ChessTutorial.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -25,10 +25,22 @@ import TutorialSpecialMoves from "./steps/TutorialSpecialMoves";
 import TutorialCheckmate from "./steps/TutorialCheckmate";
 import TutorialStrategy from "./steps/TutorialStrategy";
 
+// Import custom scrollbar styles
+import "../../styles/customScrollbar.css";
+
 const ChessTutorial = ({ open, onClose }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = useState(0);
+
+  // Add class for scrollbar dark mode detection
+  useEffect(() => {
+    if (theme.palette.mode === "dark") {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [theme.palette.mode]);
 
   // Step definitions with titles and components
   const steps = [
@@ -116,6 +128,8 @@ const ChessTutorial = ({ open, onClose }) => {
             theme.palette.mode === "dark"
               ? "0 10px 40px rgba(0,0,0,0.5)"
               : "0 10px 40px rgba(0,0,0,0.15)",
+          display: "flex", // Set to flex
+          flexDirection: "column", // Use column layout
         },
       }}
     >
@@ -135,6 +149,7 @@ const ChessTutorial = ({ open, onClose }) => {
                   theme.palette.primary.light,
                   0.2
                 )}, transparent)`,
+          flex: "0 0 auto", // Don't allow to grow or shrink
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -191,7 +206,8 @@ const ChessTutorial = ({ open, onClose }) => {
         sx={{
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
-          height: "calc(100% - 144px)", // 80px für Header + 64px für Footer
+          flex: "1 1 auto", // Allow to grow and shrink
+          overflow: "hidden", // Hide overflow
         }}
       >
         {/* Navigation sidebar */}
@@ -208,6 +224,32 @@ const ChessTutorial = ({ open, onClose }) => {
             p: 0,
             overflow: "auto",
             flex: 1,
+            scrollbarWidth: "thin", // For Firefox
+            "&::-webkit-scrollbar": {
+              // For Webkit browsers
+              width: "8px",
+              height: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: alpha(
+                theme.palette.mode === "dark" ? "#fff" : "#000",
+                0.04
+              ),
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: alpha(
+                theme.palette.mode === "dark" ? "#fff" : "#000",
+                0.2
+              ),
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: alpha(
+                theme.palette.mode === "dark" ? "#fff" : "#000",
+                0.3
+              ),
+            },
           }}
         >
           <motion.div
