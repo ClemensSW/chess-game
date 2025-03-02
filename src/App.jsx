@@ -1,4 +1,4 @@
-// src/App.jsx - Verbesserte Version mit Fehlerbehebungen
+// src/App.jsx - Modernisierte Version
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   Container,
@@ -22,6 +22,10 @@ import {
   ThemeProvider,
   Snackbar,
   Alert,
+  Avatar,
+  useTheme,
+  alpha,
+  Stack,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -40,6 +44,9 @@ import SportEsportsIcon from "@mui/icons-material/SportsEsports";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import CloseIcon from "@mui/icons-material/Close";
 import SchoolIcon from "@mui/icons-material/School";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 
 // Komponenten
 import ChessBoard from "./components/ChessBoard";
@@ -51,8 +58,8 @@ import ChessTutorial from "./components/ChessTutorial";
 import { getThemeByMode } from "./theme";
 import { Chess } from "chess.js";
 
-// App-Verion
-const APP_VERSION = "1.1.0";
+// App-Version
+const APP_VERSION = "2.0.0";
 
 function App() {
   // Theme State
@@ -60,6 +67,7 @@ function App() {
     localStorage.getItem("themeMode") || "light"
   );
   const theme = getThemeByMode(mode);
+  const currentTheme = useTheme();
 
   // MediaQuery für responsive Anpassungen
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -88,7 +96,7 @@ function App() {
     computerDifficulty: 3,
     timeControl: "10min",
     timeIncrement: 5,
-    boardTheme: "classic",
+    boardTheme: "modern", // Geändert von "classic" zu "modern" als Standard
     pieceStyle: "standard",
     boardSize: 2,
     animationSpeed: 2,
@@ -469,122 +477,275 @@ function App() {
         "& .MuiDrawer-paper": {
           width: 280,
           boxSizing: "border-box",
-          borderRadius: 0,
+          borderRadius: "0 16px 16px 0",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          background:
+            theme.palette.mode === "dark"
+              ? `linear-gradient(145deg, ${alpha(
+                  theme.palette.background.paper,
+                  0.9
+                )}, ${alpha(theme.palette.background.default, 0.95)})`
+              : `linear-gradient(145deg, ${alpha("#fff", 0.97)}, ${alpha(
+                  theme.palette.background.default,
+                  0.95
+                )})`,
         },
       }}
     >
       <Box
         sx={{
-          p: 2,
+          p: 3,
           display: "flex",
-          justifyContent: "space-between",
+          flexDirection: "column",
           alignItems: "center",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+          background: alpha(theme.palette.primary.main, 0.03),
         }}
       >
-        <Typography variant="h6" component="div">
-          Premium Chess
+        <Avatar
+          sx={{
+            width: 60,
+            height: 60,
+            mb: 2,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+          }}
+        >
+          <SportEsportsIcon sx={{ fontSize: 32 }} />
+        </Avatar>
+
+        <Typography
+          variant="h5"
+          component="div"
+          fontWeight="bold"
+          sx={{ mb: 0.5 }}
+        >
+          ChessMaster Pro
         </Typography>
-        <IconButton onClick={toggleDrawer}>
-          <CloseIcon />
+
+        <Typography variant="caption" color="text.secondary">
+          Version {APP_VERSION}
+        </Typography>
+
+        <IconButton
+          onClick={toggleDrawer}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            backgroundColor: alpha(theme.palette.background.paper, 0.3),
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.background.paper, 0.5),
+            },
+          }}
+        >
+          <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
 
-      <Divider />
-
       <Box sx={{ p: 2 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<RefreshIcon />}
-          onClick={handleNewGame}
-          fullWidth
-          sx={{ mb: 1 }}
+        <Typography
+          variant="overline"
+          color="text.secondary"
+          sx={{ pl: 1, display: "block", mb: 1 }}
         >
-          Neues Spiel
-        </Button>
+          Spieloptionen
+        </Typography>
 
-        <Button
-          variant="outlined"
-          startIcon={<UndoIcon />}
-          onClick={handleUndoMove}
-          fullWidth
-          sx={{ mb: 1 }}
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 2,
+            p: 1,
+            backgroundColor: alpha(theme.palette.primary.main, 0.07),
+            borderRadius: 2,
+          }}
         >
-          Zug zurück
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<RefreshIcon />}
+            onClick={handleNewGame}
+            fullWidth
+            sx={{
+              mb: 1,
+              borderRadius: 1.5,
+              py: 1,
+              boxShadow: 2,
+              background: `linear-gradient(135deg, ${
+                theme.palette.primary.main
+              }, ${alpha(theme.palette.primary.dark, 0.8)})`,
+            }}
+          >
+            Neues Spiel
+          </Button>
 
-        <Button
-          variant="outlined"
-          startIcon={<FlipIcon />}
-          onClick={handleFlipBoard}
-          fullWidth
-          sx={{ mb: 1 }}
-        >
-          Brett drehen
-        </Button>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <Button
+                variant="outlined"
+                startIcon={<UndoIcon />}
+                onClick={handleUndoMove}
+                fullWidth
+                sx={{ borderRadius: 1.5 }}
+              >
+                Zurück
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="outlined"
+                startIcon={<FlipIcon />}
+                onClick={handleFlipBoard}
+                fullWidth
+                sx={{ borderRadius: 1.5 }}
+              >
+                Drehen
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
 
-        <Button
-          variant="outlined"
-          startIcon={<SaveIcon />}
-          onClick={handleSaveGame}
-          fullWidth
-          sx={{ mb: 1 }}
+        <Typography
+          variant="overline"
+          color="text.secondary"
+          sx={{ pl: 1, display: "block", mb: 1 }}
         >
-          Spiel speichern
-        </Button>
+          Spielstand
+        </Typography>
 
-        <Button
-          variant="outlined"
-          startIcon={<FolderOpenIcon />}
-          onClick={handleLoadGame}
-          fullWidth
-          sx={{ mb: 1 }}
-        >
-          Spiel laden
-        </Button>
+        <Stack spacing={1} sx={{ mb: 3 }}>
+          <Button
+            variant="outlined"
+            startIcon={<SaveIcon />}
+            onClick={handleSaveGame}
+            fullWidth
+            sx={{
+              borderRadius: 1.5,
+              justifyContent: "flex-start",
+              px: 2,
+              py: 1,
+              backgroundColor: alpha(theme.palette.background.paper, 0.4),
+            }}
+          >
+            Spiel speichern
+          </Button>
+
+          <Button
+            variant="outlined"
+            startIcon={<FolderOpenIcon />}
+            onClick={handleLoadGame}
+            fullWidth
+            sx={{
+              borderRadius: 1.5,
+              justifyContent: "flex-start",
+              px: 2,
+              py: 1,
+              backgroundColor: alpha(theme.palette.background.paper, 0.4),
+            }}
+          >
+            Spiel laden
+          </Button>
+        </Stack>
       </Box>
 
-      <Divider />
+      <Divider sx={{ mx: 2, opacity: 0.6 }} />
 
       <Box sx={{ p: 2 }}>
+        <Typography
+          variant="overline"
+          color="text.secondary"
+          sx={{ pl: 1, display: "block", mb: 1 }}
+        >
+          Einstellungen & Hilfe
+        </Typography>
+
+        <Stack spacing={0.5}>
+          <Button
+            variant="text"
+            startIcon={<SchoolIcon />}
+            onClick={() => {
+              setTutorialOpen(true);
+              toggleDrawer();
+            }}
+            fullWidth
+            sx={{
+              justifyContent: "flex-start",
+              py: 1.5,
+              borderRadius: 1.5,
+            }}
+          >
+            Schach-Anleitung
+          </Button>
+
+          <Button
+            variant="text"
+            startIcon={mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+            onClick={toggleTheme}
+            fullWidth
+            sx={{
+              justifyContent: "flex-start",
+              py: 1.5,
+              borderRadius: 1.5,
+            }}
+          >
+            {mode === "light" ? "Dark Mode" : "Light Mode"}
+          </Button>
+
+          <Button
+            variant="text"
+            startIcon={<SettingsIcon />}
+            onClick={() => {
+              setSettingsOpen(true);
+              toggleDrawer();
+            }}
+            fullWidth
+            sx={{
+              justifyContent: "flex-start",
+              py: 1.5,
+              borderRadius: 1.5,
+            }}
+          >
+            Einstellungen
+          </Button>
+
+          <Button
+            variant="text"
+            startIcon={<HelpOutlineIcon />}
+            fullWidth
+            sx={{
+              justifyContent: "flex-start",
+              py: 1.5,
+              borderRadius: 1.5,
+            }}
+          >
+            Hilfe & Support
+          </Button>
+        </Stack>
+      </Box>
+
+      <Box sx={{ flexGrow: 1 }} />
+
+      <Box
+        sx={{
+          p: 2,
+          mt: "auto",
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+          textAlign: "center",
+        }}
+      >
         <Button
           variant="text"
-          startIcon={<SchoolIcon />}
-          onClick={() => setTutorialOpen(true)}
-          fullWidth
-          sx={{ mb: 1, justifyContent: "flex-start" }}
+          size="small"
+          startIcon={<PersonOutlineIcon />}
+          sx={{ mb: 1, borderRadius: 4, textTransform: "none" }}
         >
-          Schach-Anleitung
+          Profil & Account
         </Button>
 
-        <Button
-          variant="text"
-          startIcon={mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-          onClick={toggleTheme}
-          fullWidth
-          sx={{ mb: 1, justifyContent: "flex-start" }}
-        >
-          {mode === "light" ? "Dark Mode" : "Light Mode"}
-        </Button>
-
-        <Button
-          variant="text"
-          startIcon={<SettingsIcon />}
-          onClick={() => setSettingsOpen(true)}
-          fullWidth
-          sx={{ mb: 1, justifyContent: "flex-start" }}
-        >
-          Einstellungen
-        </Button>
-
-        <Button
-          variant="text"
-          startIcon={<InfoIcon />}
-          fullWidth
-          sx={{ mb: 1, justifyContent: "flex-start" }}
-        >
-          Über Premium Chess
-        </Button>
+        <Typography variant="caption" color="text.secondary" display="block">
+          © {new Date().getFullYear()} ChessMaster Pro
+        </Typography>
       </Box>
     </Drawer>
   );
@@ -609,66 +770,144 @@ function App() {
         sx={{
           flexGrow: 1,
           minHeight: "100vh",
-          backgroundColor: "background.default",
+          background:
+            theme.palette.mode === "dark"
+              ? `linear-gradient(145deg, ${alpha(
+                  theme.palette.background.default,
+                  0.97
+                )}, ${alpha("#000", 0.95)})`
+              : `linear-gradient(145deg, ${alpha(
+                  theme.palette.background.default,
+                  0.97
+                )}, ${alpha("#f9f9f9", 0.95)})`,
           overflow: "hidden",
+          position: "relative",
         }}
       >
-        <AppBar position="static" color="primary" elevation={0}>
+        <AppBar
+          position="static"
+          elevation={0}
+          sx={{
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(90deg, ${alpha(
+                    theme.palette.primary.dark,
+                    0.8
+                  )}, ${alpha(theme.palette.primary.main, 0.6)})`
+                : `linear-gradient(90deg, ${
+                    theme.palette.primary.main
+                  }, ${alpha(theme.palette.primary.dark, 0.85)})`,
+            borderBottom: `1px solid ${alpha(theme.palette.primary.dark, 0.1)}`,
+            backdropFilter: "blur(8px)",
+          }}
+        >
           <Toolbar>
-            {isMobile ? (
-              <IconButton
-                color="inherit"
-                edge="start"
-                onClick={toggleDrawer}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            ) : null}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer}
+              sx={{
+                mr: 2,
+                borderRadius: 2,
+                backgroundColor: alpha("#fff", 0.1),
+                "&:hover": {
+                  backgroundColor: alpha("#fff", 0.2),
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ flexGrow: 1, fontWeight: 600 }}
-              >
-                <SportEsportsIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Premium Chess
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <SportEsportsIcon
+                  sx={{
+                    mr: 1.5,
+                    fontSize: 28,
+                    filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  component="div"
+                  sx={{
+                    fontWeight: 700,
+                    letterSpacing: 0.5,
+                    background:
+                      "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  ChessMaster Pro
+                </Typography>
+              </Box>
             </motion.div>
 
             <Box sx={{ flexGrow: 1 }} />
 
             {!isMobile && (
-              <>
+              <Stack direction="row" spacing={0.5} sx={{ mr: 2 }}>
                 <Tooltip title="Schach-Anleitung">
                   <IconButton
                     color="inherit"
                     onClick={() => setTutorialOpen(true)}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha("#fff", 0.1),
+                      "&:hover": { backgroundColor: alpha("#fff", 0.2) },
+                    }}
                   >
-                    <SchoolIcon />
+                    <SchoolIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
 
                 <Tooltip title="Neues Spiel">
-                  <IconButton color="inherit" onClick={handleNewGame}>
-                    <RefreshIcon />
+                  <IconButton
+                    color="inherit"
+                    onClick={handleNewGame}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha("#fff", 0.1),
+                      "&:hover": { backgroundColor: alpha("#fff", 0.2) },
+                    }}
+                  >
+                    <RefreshIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
 
                 <Tooltip title="Zug zurück">
-                  <IconButton color="inherit" onClick={handleUndoMove}>
-                    <UndoIcon />
+                  <IconButton
+                    color="inherit"
+                    onClick={handleUndoMove}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha("#fff", 0.1),
+                      "&:hover": { backgroundColor: alpha("#fff", 0.2) },
+                    }}
+                  >
+                    <UndoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
 
                 <Tooltip title="Brett drehen">
-                  <IconButton color="inherit" onClick={handleFlipBoard}>
-                    <FlipIcon />
+                  <IconButton
+                    color="inherit"
+                    onClick={handleFlipBoard}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha("#fff", 0.1),
+                      "&:hover": { backgroundColor: alpha("#fff", 0.2) },
+                    }}
+                  >
+                    <FlipIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
 
@@ -678,8 +917,13 @@ function App() {
                     onClick={handleActionMenuOpen}
                     aria-controls="action-menu"
                     aria-haspopup="true"
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha("#fff", 0.1),
+                      "&:hover": { backgroundColor: alpha("#fff", 0.2) },
+                    }}
                   >
-                    <SettingsIcon />
+                    <SettingsIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
 
@@ -689,38 +933,94 @@ function App() {
                   keepMounted
                   open={Boolean(actionMenuAnchor)}
                   onClose={handleActionMenuClose}
+                  PaperProps={{
+                    elevation: 3,
+                    sx: {
+                      borderRadius: 2,
+                      minWidth: 200,
+                      mt: 1,
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.background.paper, 0.9)
+                          : alpha(theme.palette.background.paper, 0.9),
+                      backdropFilter: "blur(10px)",
+                      overflow: "visible",
+                      "&:before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: -5,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "rotate(45deg)",
+                        zIndex: 0,
+                      },
+                    },
+                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                  <MenuItem onClick={handleSaveGame}>
+                  <MenuItem
+                    onClick={handleSaveGame}
+                    sx={{ py: 1.5, borderRadius: 1, mx: 0.5 }}
+                  >
                     <ListItemIcon>
                       <SaveIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Spiel speichern</ListItemText>
                   </MenuItem>
-                  <MenuItem onClick={handleLoadGame}>
+                  <MenuItem
+                    onClick={handleLoadGame}
+                    sx={{ py: 1.5, borderRadius: 1, mx: 0.5 }}
+                  >
                     <ListItemIcon>
                       <FolderOpenIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Spiel laden</ListItemText>
                   </MenuItem>
-                  <Divider />
-                  <MenuItem onClick={() => setSettingsOpen(true)}>
+                  <Divider sx={{ my: 1 }} />
+                  <MenuItem
+                    onClick={() => {
+                      setSettingsOpen(true);
+                      handleActionMenuClose();
+                    }}
+                    sx={{ py: 1.5, borderRadius: 1, mx: 0.5 }}
+                  >
                     <ListItemIcon>
                       <SettingsIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Einstellungen</ListItemText>
                   </MenuItem>
-                  <MenuItem onClick={() => handleShareGame()}>
+                  <MenuItem
+                    onClick={() => {
+                      handleShareGame();
+                      handleActionMenuClose();
+                    }}
+                    sx={{ py: 1.5, borderRadius: 1, mx: 0.5 }}
+                  >
                     <ListItemIcon>
                       <ShareIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Spiel teilen</ListItemText>
                   </MenuItem>
                 </Menu>
-              </>
+              </Stack>
             )}
 
             <Tooltip title={mode === "light" ? "Dark Mode" : "Light Mode"}>
-              <IconButton color="inherit" onClick={toggleTheme}>
+              <IconButton
+                color="inherit"
+                onClick={toggleTheme}
+                sx={{
+                  borderRadius: 2,
+                  backgroundColor: alpha("#fff", 0.1),
+                  "&:hover": {
+                    backgroundColor: alpha("#fff", 0.2),
+                  },
+                }}
+              >
                 {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
               </IconButton>
             </Tooltip>
@@ -736,7 +1036,7 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           sx={{
-            mt: { xs: 2, md: 4 },
+            mt: { xs: 3, md: 5 },
             mb: 4,
           }}
         >
@@ -761,41 +1061,116 @@ function App() {
                 {/* Mobile Controls - Nur auf kleinen Bildschirmen anzeigen */}
                 {isMobile && (
                   <Paper
-                    elevation={2}
+                    elevation={1}
                     sx={{
                       mt: 2,
                       width: "94vw",
                       p: 1.5,
                       display: "flex",
                       justifyContent: "space-around",
+                      borderRadius: 3,
+                      backgroundColor: alpha(
+                        theme.palette.background.paper,
+                        0.8
+                      ),
+                      backdropFilter: "blur(10px)",
                     }}
                   >
                     <Tooltip title="Neues Spiel">
-                      <IconButton color="primary" onClick={handleNewGame}>
+                      <IconButton
+                        color="primary"
+                        onClick={handleNewGame}
+                        sx={{
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.1
+                          ),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              0.2
+                            ),
+                          },
+                        }}
+                      >
                         <RefreshIcon />
                       </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Zug zurück">
-                      <IconButton color="secondary" onClick={handleUndoMove}>
+                      <IconButton
+                        color="secondary"
+                        onClick={handleUndoMove}
+                        sx={{
+                          backgroundColor: alpha(
+                            theme.palette.secondary.main,
+                            0.1
+                          ),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.secondary.main,
+                              0.2
+                            ),
+                          },
+                        }}
+                      >
                         <UndoIcon />
                       </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Brett drehen">
-                      <IconButton onClick={handleFlipBoard}>
+                      <IconButton
+                        onClick={handleFlipBoard}
+                        sx={{
+                          backgroundColor: alpha(
+                            theme.palette.text.primary,
+                            0.05
+                          ),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.text.primary,
+                              0.1
+                            ),
+                          },
+                        }}
+                      >
                         <FlipIcon />
                       </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Spiel speichern">
-                      <IconButton onClick={handleSaveGame}>
+                      <IconButton
+                        onClick={handleSaveGame}
+                        sx={{
+                          backgroundColor: alpha(
+                            theme.palette.success.main,
+                            0.1
+                          ),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.success.main,
+                              0.2
+                            ),
+                          },
+                        }}
+                      >
                         <SaveIcon />
                       </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Spiel laden">
-                      <IconButton onClick={handleLoadGame}>
+                      <IconButton
+                        onClick={handleLoadGame}
+                        sx={{
+                          backgroundColor: alpha(theme.palette.info.main, 0.1),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.info.main,
+                              0.2
+                            ),
+                          },
+                        }}
+                      >
                         <FolderOpenIcon />
                       </IconButton>
                     </Tooltip>
@@ -832,15 +1207,33 @@ function App() {
             sx={{
               mt: 4,
               p: 2,
-              borderRadius: 2,
+              borderRadius: 3,
               textAlign: "center",
-              backgroundColor: "transparent",
+              backgroundColor: alpha(theme.palette.background.paper, 0.6),
+              backdropFilter: "blur(10px)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 2,
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Premium Chess v{APP_VERSION} | © {new Date().getFullYear()} Your
-              Company
+              ChessMaster Pro v{APP_VERSION} | © {new Date().getFullYear()}{" "}
+              Chess Solutions GmbH
             </Typography>
+
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <IconButton size="small" sx={{ color: "text.secondary" }}>
+                <GitHubIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" sx={{ color: "text.secondary" }}>
+                <HelpOutlineIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" sx={{ color: "text.secondary" }}>
+                <InfoIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
         </Container>
 
@@ -889,7 +1282,11 @@ function App() {
             onClose={handleSnackbarClose}
             severity={snackbarSeverity}
             variant="filled"
-            sx={{ width: "100%" }}
+            sx={{
+              width: "100%",
+              borderRadius: 2,
+              boxShadow: 3,
+            }}
           >
             {snackbarMessage}
           </Alert>
