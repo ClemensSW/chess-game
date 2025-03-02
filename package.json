@@ -15,7 +15,9 @@
     "@mui/icons-material": "^6.4.6",
     "@mui/material": "^6.4.6",
     "chess.js": "^1.1.0",
+    "framer-motion": "^12.4.7",
     "react": "^19.0.0",
+    "react-confetti": "^6.3.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
