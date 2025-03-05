@@ -229,7 +229,7 @@ const GameModeSelection = () => {
                   textShadow: "0 2px 10px rgba(0,0,0,0.1)",
                 }}
               >
-                ChessMaster Pro
+                ChessMaster
               </Typography>
               <Typography
                 variant="h5"
@@ -541,8 +541,8 @@ const GameModeSelection = () => {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            © {new Date().getFullYear()} ChessMaster Pro • Wähle einen Modus um
-            zu starten
+            © {new Date().getFullYear()} ChessMaster • Wähle einen Modus um zu
+            starten
           </Typography>
         </Box>
       </Container>
