@@ -17,7 +17,7 @@ import ActionMenu from "./components/layout/ActionMenu";
 import AppFooter from "./components/layout/AppFooter";
 import ChessBoardContainer from "./components/board/ChessBoardContainer";
 import SidebarControls from "./components/controls/SidebarControls";
-import GameEndDialog from "./components/GameEndDialog";
+import { GameEndDialog } from "./components/game-end";
 import SettingsDialog from "./components/settings/SettingsDialog";
 import ChessTutorial from "./components/tutorial/ChessTutorial";
 
