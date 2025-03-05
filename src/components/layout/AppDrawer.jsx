@@ -9,8 +9,8 @@ import {
   Divider,
   IconButton,
   Avatar,
-  Paper, // Added this
-  alpha, // Added this import
+  Paper,
+  alpha,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -37,7 +37,7 @@ import { useGame } from "../../contexts/GameContext";
 const APP_VERSION = "2.0.0";
 
 const AppDrawer = ({ open, onClose, onOpenSettings, onOpenTutorial }) => {
-  const { theme, mode, toggleTheme } = useTheme();
+  const { mode, toggleTheme } = useTheme();
   const {
     handleNewGame,
     handleUndoMove,
@@ -81,32 +81,50 @@ const AppDrawer = ({ open, onClose, onOpenSettings, onOpenTutorial }) => {
           background: (theme) => alpha(theme.palette.primary.main, 0.03),
         }}
       >
-        <Avatar
-          sx={{
-            width: 60,
-            height: 60,
-            mb: 2,
-            background: (theme) =>
-              `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            boxShadow: (theme) =>
-              `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-          }}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
         >
-          <SportEsportsIcon sx={{ fontSize: 32 }} />
-        </Avatar>
+          <Avatar
+            sx={{
+              width: 60,
+              height: 60,
+              mb: 2,
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              boxShadow: (theme) =>
+                `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+            }}
+          >
+            <SportEsportsIcon sx={{ fontSize: 32 }} />
+          </Avatar>
+        </motion.div>
 
-        <Typography
-          variant="h5"
-          component="div"
-          fontWeight="bold"
-          sx={{ mb: 0.5 }}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
         >
-          ChessMaster Pro
-        </Typography>
+          <Typography
+            variant="h5"
+            component="div"
+            fontWeight="bold"
+            sx={{ mb: 0.5 }}
+          >
+            ChessMaster Pro
+          </Typography>
+        </motion.div>
 
-        <Typography variant="caption" color="text.secondary">
-          Version {APP_VERSION}
-        </Typography>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            Version {APP_VERSION}
+          </Typography>
+        </motion.div>
 
         <IconButton
           onClick={onClose}
@@ -136,6 +154,10 @@ const AppDrawer = ({ open, onClose, onOpenSettings, onOpenTutorial }) => {
         </Typography>
 
         <Paper
+          component={motion.div}
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
           elevation={0}
           sx={{
             mb: 2,
@@ -204,47 +226,53 @@ const AppDrawer = ({ open, onClose, onOpenSettings, onOpenTutorial }) => {
           Game State
         </Typography>
 
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Button
-            variant="outlined"
-            startIcon={<SaveIcon />}
-            onClick={() => {
-              handleSaveGame();
-              onClose();
-            }}
-            fullWidth
-            sx={{
-              borderRadius: 1.5,
-              justifyContent: "flex-start",
-              px: 2,
-              py: 1,
-              backgroundColor: (theme) =>
-                alpha(theme.palette.background.paper, 0.4),
-            }}
-          >
-            Save Game
-          </Button>
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <Stack spacing={1} sx={{ mb: 3 }}>
+            <Button
+              variant="outlined"
+              startIcon={<SaveIcon />}
+              onClick={() => {
+                handleSaveGame();
+                onClose();
+              }}
+              fullWidth
+              sx={{
+                borderRadius: 1.5,
+                justifyContent: "flex-start",
+                px: 2,
+                py: 1,
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.background.paper, 0.4),
+              }}
+            >
+              Save Game
+            </Button>
 
-          <Button
-            variant="outlined"
-            startIcon={<FileOpenIcon />}
-            onClick={() => {
-              handleLoadGame();
-              onClose();
-            }}
-            fullWidth
-            sx={{
-              borderRadius: 1.5,
-              justifyContent: "flex-start",
-              px: 2,
-              py: 1,
-              backgroundColor: (theme) =>
-                alpha(theme.palette.background.paper, 0.4),
-            }}
-          >
-            Load Game
-          </Button>
-        </Stack>
+            <Button
+              variant="outlined"
+              startIcon={<FileOpenIcon />}
+              onClick={() => {
+                handleLoadGame();
+                onClose();
+              }}
+              fullWidth
+              sx={{
+                borderRadius: 1.5,
+                justifyContent: "flex-start",
+                px: 2,
+                py: 1,
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.background.paper, 0.4),
+              }}
+            >
+              Load Game
+            </Button>
+          </Stack>
+        </motion.div>
       </Box>
 
       <Divider sx={{ mx: 2, opacity: 0.6 }} />
@@ -258,76 +286,88 @@ const AppDrawer = ({ open, onClose, onOpenSettings, onOpenTutorial }) => {
           Settings & Help
         </Typography>
 
-        <Stack spacing={0.5}>
-          <Button
-            variant="text"
-            startIcon={<SchoolIcon />}
-            onClick={() => {
-              onOpenTutorial();
-              onClose();
-            }}
-            fullWidth
-            sx={{
-              justifyContent: "flex-start",
-              py: 1.5,
-              borderRadius: 1.5,
-            }}
-          >
-            Chess Tutorial
-          </Button>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <Stack spacing={0.5}>
+            <Button
+              variant="text"
+              startIcon={<SchoolIcon />}
+              onClick={() => {
+                onOpenTutorial();
+                onClose();
+              }}
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                py: 1.5,
+                borderRadius: 1.5,
+              }}
+            >
+              Chess Tutorial
+            </Button>
 
-          <Button
-            variant="text"
-            startIcon={mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-            onClick={() => {
-              toggleTheme();
-              onClose();
-            }}
-            fullWidth
-            sx={{
-              justifyContent: "flex-start",
-              py: 1.5,
-              borderRadius: 1.5,
-            }}
-          >
-            {mode === "light" ? "Dark Mode" : "Light Mode"}
-          </Button>
+            <Button
+              variant="text"
+              startIcon={
+                mode === "light" ? <DarkModeIcon /> : <LightModeIcon />
+              }
+              onClick={() => {
+                toggleTheme();
+                onClose();
+              }}
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                py: 1.5,
+                borderRadius: 1.5,
+              }}
+            >
+              {mode === "light" ? "Dark Mode" : "Light Mode"}
+            </Button>
 
-          <Button
-            variant="text"
-            startIcon={<SettingsIcon />}
-            onClick={() => {
-              onOpenSettings();
-              onClose();
-            }}
-            fullWidth
-            sx={{
-              justifyContent: "flex-start",
-              py: 1.5,
-              borderRadius: 1.5,
-            }}
-          >
-            Settings
-          </Button>
+            <Button
+              variant="text"
+              startIcon={<SettingsIcon />}
+              onClick={() => {
+                onOpenSettings();
+                onClose();
+              }}
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                py: 1.5,
+                borderRadius: 1.5,
+              }}
+            >
+              Settings
+            </Button>
 
-          <Button
-            variant="text"
-            startIcon={<HelpOutlineIcon />}
-            fullWidth
-            sx={{
-              justifyContent: "flex-start",
-              py: 1.5,
-              borderRadius: 1.5,
-            }}
-          >
-            Help & Support
-          </Button>
-        </Stack>
+            <Button
+              variant="text"
+              startIcon={<HelpOutlineIcon />}
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                py: 1.5,
+                borderRadius: 1.5,
+              }}
+            >
+              Help & Support
+            </Button>
+          </Stack>
+        </motion.div>
       </Box>
 
       <Box sx={{ flexGrow: 1 }} />
 
       <Box
+        component={motion.div}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
         sx={{
           p: 2,
           mt: "auto",

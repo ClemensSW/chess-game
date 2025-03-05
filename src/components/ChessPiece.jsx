@@ -12,10 +12,7 @@ const pieceSymbols = {
   p: { w: "♙", b: "♟" }, // Bauer
 };
 
-// SVG-basierte Figuren für eine noch modernere Option (Future Enhancement)
-const svgPieces = {
-  // SVG-Pfade für moderne Figuren könnten hier definiert werden
-};
+// SVG-basierte Figuren können in zukünftigen Versionen implementiert werden
 
 const ChessPiece = ({ type, color, isSelected }) => {
   // Fallback auf leeren String, wenn Symbol nicht gefunden wird

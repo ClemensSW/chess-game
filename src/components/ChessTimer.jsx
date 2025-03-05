@@ -61,12 +61,6 @@ const ChessTimer = ({
     setIsRunning((prev) => !prev);
   };
 
-  const resetTimer = () => {
-    setWhiteTime(initialTime);
-    setBlackTime(initialTime);
-    setIsRunning(true);
-  };
-
   // Formatiert die Zeit in MM:SS
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);

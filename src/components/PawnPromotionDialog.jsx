@@ -18,11 +18,10 @@ const PawnPromotionDialog = ({
   position,
   color,
   onSelect,
-  orientation = "white",
   pieceStyle = "standard",
 }) => {
   const theme = useTheme();
-  const { row, col, onTop } = position || { row: 0, col: 0, onTop: true };
+  const { col, onTop } = position || { col: 0, onTop: true };
 
   if (!open) return null;
 

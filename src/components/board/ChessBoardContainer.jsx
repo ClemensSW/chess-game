@@ -31,6 +31,10 @@ const ChessBoardContainer = ({ isMobile }) => {
 
   return (
     <Box
+      component={motion.div}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       sx={{
         display: "flex",
         justifyContent: "center",
@@ -48,6 +52,10 @@ const ChessBoardContainer = ({ isMobile }) => {
       {/* Mobile Controls - Only show on small screens */}
       {isMobile && (
         <Paper
+          component={motion.div}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
           elevation={1}
           sx={{
             mt: 2,

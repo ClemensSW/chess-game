@@ -8,7 +8,7 @@ import {
   IconButton,
   Stack,
   Tooltip,
-  alpha, // Added this import
+  alpha,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -35,6 +35,9 @@ const AppHeader = ({
 }) => {
   const { mode, toggleTheme } = useTheme();
   const { handleNewGame, handleUndoMove, handleFlipBoard } = useGame();
+
+  // Using motion.div directly for the app title
+  const MotionBox = motion(Box);
 
   return (
     <AppBar
@@ -74,37 +77,35 @@ const AppHeader = ({
           <MenuIcon />
         </IconButton>
 
-        <motion.div
+        <MotionBox
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
+          sx={{ display: "flex", alignItems: "center" }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <SportEsportsIcon
-              sx={{
-                mr: 1.5,
-                fontSize: 28,
-                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-              }}
-            />
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                fontWeight: 700,
-                letterSpacing: 0.5,
-                background:
-                  "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              }}
-            >
-              ChessMaster Pro
-            </Typography>
-          </Box>
-        </motion.div>
+          <SportEsportsIcon
+            sx={{
+              mr: 1.5,
+              fontSize: 28,
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+            }}
+          />
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              background: "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            ChessMaster Pro
+          </Typography>
+        </MotionBox>
 
         <Box sx={{ flexGrow: 1 }} />
 

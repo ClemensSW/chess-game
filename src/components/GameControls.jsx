@@ -48,24 +48,6 @@ const GameControls = ({ onNewGame, onUndoMove, onSaveGame, onLoadGame }) => {
     setSettingsOpen(false);
   };
 
-  // Zeit-Optionen in Sekunden umrechnen
-  const getTimeInSeconds = (timeOption) => {
-    switch (timeOption) {
-      case "3min":
-        return 180;
-      case "5min":
-        return 300;
-      case "10min":
-        return 600;
-      case "15min":
-        return 900;
-      case "30min":
-        return 1800;
-      default:
-        return 600;
-    }
-  };
-
   return (
     <>
       <Paper
