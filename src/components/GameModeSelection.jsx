@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   alpha,
   Container,
+  Tooltip,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -18,12 +19,15 @@ import PersonIcon from "@mui/icons-material/Person";
 import PeopleIcon from "@mui/icons-material/People";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportEsportsIcon from "@mui/icons-material/SportsEsports";
+import SpeedIcon from "@mui/icons-material/Speed";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import PsychologyIcon from "@mui/icons-material/Psychology";
 
 // Components
 import AnimatedChessPieces from "./decorative/AnimatedChessPieces";
 import DecorativeChessBoard from "./decorative/DecorativeChessBoard";
+import StyledSlider from "./settings/shared/StyledSlider";
 
 // Hooks
 import { useGame } from "../contexts/GameContext";
@@ -40,8 +44,7 @@ const GameModeSelection = () => {
 
   const { setAppSettings, handleNewGame } = useGame();
   const [selectedMode, setSelectedMode] = useState(null);
-  const [difficulty, setDifficulty] = useState(3);
-  const [hoverMode, setHoverMode] = useState(null);
+  const [difficulty, setDifficulty] = useState(5);
 
   // Handle game mode selection
   const handleModeSelect = (mode) => {
@@ -49,8 +52,8 @@ const GameModeSelection = () => {
   };
 
   // Handle difficulty change
-  const handleDifficultyChange = (level) => {
-    setDifficulty(level);
+  const handleDifficultyChange = (event, value) => {
+    setDifficulty(value);
   };
 
   // Start the game with selected settings
@@ -98,10 +101,36 @@ const GameModeSelection = () => {
     },
   };
 
-  // Difficulty level options
-  const difficultyLevels = [
+  // Get difficulty label based on value
+  const getDifficultyLabel = (value) => {
+    // All 10 difficulty levels
+    const labels = {
+      1: "Anfänger",
+      2: "Sehr leicht",
+      3: "Leicht",
+      4: "Einfach",
+      5: "Mittel",
+      6: "Anspruchsvoll",
+      7: "Fortgeschritten",
+      8: "Schwer",
+      9: "Sehr schwer",
+      10: "Experte",
+    };
+
+    return labels[value] || `Stufe ${value}`;
+  };
+
+  // Get color for difficulty level
+  const getDifficultyColor = (value) => {
+    if (value <= 3) return theme.palette.success.main;
+    if (value <= 7) return theme.palette.warning.main;
+    return theme.palette.error.main;
+  };
+
+  // Create marks for slider
+  const difficultyMarks = [
     { value: 1, label: "Anfänger" },
-    { value: 3, label: "Einfach" },
+    { value: 3, label: "Leicht" },
     { value: 5, label: "Mittel" },
     { value: 7, label: "Fortgeschritten" },
     { value: 10, label: "Experte" },
@@ -127,37 +156,56 @@ const GameModeSelection = () => {
             backdropFilter: "blur(8px)",
           }}
         >
-          <Typography variant="h6" gutterBottom textAlign="center">
-            Schwierigkeitsgrad wählen
+          <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+            <PsychologyIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
+            <Typography variant="h6" fontWeight={600}>
+              Schwierigkeitsgrad wählen
+            </Typography>
+          </Box>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Wähle aus 10 Schwierigkeitsstufen - von Anfänger bis Experte
           </Typography>
 
-          <Grid container spacing={1} sx={{ mt: 2 }}>
-            {difficultyLevels.map((level) => (
-              <Grid item xs={6} md={2.4} key={level.value}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant={
-                      difficulty === level.value ? "contained" : "outlined"
-                    }
-                    fullWidth
-                    onClick={() => handleDifficultyChange(level.value)}
-                    sx={{
-                      py: 1.5,
-                      borderRadius: 2,
-                      borderWidth: difficulty === level.value ? 0 : 2,
-                      boxShadow: difficulty === level.value ? 3 : 0,
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {level.label}
-                  </Button>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
+          <StyledSlider
+            value={difficulty}
+            onChange={handleDifficultyChange}
+            min={1}
+            max={10}
+            step={1}
+            marks={difficultyMarks}
+            label="Computer-Stärke"
+            valueDisplay={getDifficultyLabel}
+            icon={EmojiEventsIcon}
+            sx={{ mt: 2, mb: 1 }}
+          />
+
+          {/* Visual difficulty representation */}
+          <Box
+            sx={{
+              mt: 3,
+              p: 1.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 2,
+              backgroundColor: alpha(getDifficultyColor(difficulty), 0.1),
+              border: `1px solid ${alpha(getDifficultyColor(difficulty), 0.2)}`,
+            }}
+          >
+            <SmartToyIcon
+              sx={{ mr: 1.5, color: getDifficultyColor(difficulty) }}
+            />
+            <Typography fontWeight={600} color={getDifficultyColor(difficulty)}>
+              {difficulty === 10
+                ? "Bereit dich auf eine echte Herausforderung vor!"
+                : difficulty >= 8
+                ? "Diese Schwierigkeitsstufe ist nur für erfahrene Spieler geeignet."
+                : difficulty >= 5
+                ? "Eine ausgewogene Herausforderung für regelmäßige Spieler."
+                : "Perfekt um die Grundlagen zu erlernen und Selbstvertrauen aufzubauen."}
+            </Typography>
+          </Box>
         </Paper>
       </motion.div>
     );
@@ -504,30 +552,39 @@ const GameModeSelection = () => {
             }}
             transition={{ delay: 0.1 }}
           >
-            <Button
-              variant="contained"
-              color={selectedMode === "computer" ? "primary" : "secondary"}
-              size="large"
-              disabled={!selectedMode}
-              onClick={handleStartGame}
-              startIcon={<SportEsportsIcon />}
-              endIcon={<ArrowForwardIcon />}
-              sx={{
-                mt: 3,
-                px: 5,
-                py: 1.5,
-                borderRadius: 3,
-                fontWeight: 700,
-                fontSize: "1.1rem",
-                boxShadow: 4,
-                backgroundImage:
-                  selectedMode === "computer"
-                    ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
-                    : `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-              }}
+            <Tooltip
+              title={!selectedMode ? "Bitte wähle einen Spielmodus" : ""}
+              arrow
             >
-              Spiel starten
-            </Button>
+              <span>
+                {" "}
+                {/* Wrapper needed for disabled Button in Tooltip */}
+                <Button
+                  variant="contained"
+                  color={selectedMode === "computer" ? "primary" : "secondary"}
+                  size="large"
+                  disabled={!selectedMode}
+                  onClick={handleStartGame}
+                  startIcon={<SportEsportsIcon />}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{
+                    mt: 3,
+                    px: 5,
+                    py: 1.5,
+                    borderRadius: 3,
+                    fontWeight: 700,
+                    fontSize: "1.1rem",
+                    boxShadow: 4,
+                    backgroundImage:
+                      selectedMode === "computer"
+                        ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                        : `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
+                  }}
+                >
+                  Spiel starten
+                </Button>
+              </span>
+            </Tooltip>
           </motion.div>
         </motion.div>
 

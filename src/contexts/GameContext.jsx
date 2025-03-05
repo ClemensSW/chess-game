@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { Chess } from "chess.js";
 import { useNotification } from "./NotificationContext";
+import ComputerPlayer from "../services/ComputerPlayer";
 
 // Create context
 const GameContext = createContext();
@@ -22,12 +23,16 @@ export const GameProvider = ({ children }) => {
   // Board ref for chess operations
   const boardRef = useRef(null);
 
+  // Computer player ref
+  const computerPlayerRef = useRef(null);
+
   // Chess Game State
   const [game, setGame] = useState(new Chess());
   const [moves, setMoves] = useState([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [currentPlayer, setCurrentPlayer] = useState("w"); // 'w' for white, 'b' for black
   const [gameEndState, setGameEndState] = useState(null);
+  const [isComputerThinking, setIsComputerThinking] = useState(false);
 
   // New state to track if game has started (for overlay)
   const [gameStarted, setGameStarted] = useState(false);
@@ -47,7 +52,7 @@ export const GameProvider = ({ children }) => {
   const [appSettings, setAppSettings] = useState({
     // Default settings
     gameMode: "human",
-    computerDifficulty: 3,
+    computerDifficulty: 5,
     timeControl: "10min",
     timeIncrement: 5,
     boardTheme: "modern",
@@ -93,6 +98,102 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("chessSettings", JSON.stringify(appSettings));
   }, [appSettings]);
+
+  // Initialize or update the computer player when the game or difficulty changes
+  useEffect(() => {
+    if (appSettings.gameMode === "computer" && game) {
+      computerPlayerRef.current = new ComputerPlayer(
+        game,
+        appSettings.computerDifficulty
+      );
+    }
+  }, [game, appSettings.gameMode, appSettings.computerDifficulty]);
+
+  // Make a computer move if it's the computer's turn
+  useEffect(() => {
+    const isComputerMode = appSettings.gameMode === "computer";
+    const isComputerTurn = currentPlayer === "b"; // Computer always plays as black
+
+    if (
+      isComputerMode &&
+      isComputerTurn &&
+      gameStarted &&
+      !gameEndState &&
+      computerPlayerRef.current
+    ) {
+      // Add a small delay for better UX
+      setIsComputerThinking(true);
+
+      const thinkingTime = 500 + Math.random() * 1000; // Random thinking time for more natural feel
+
+      const timerId = setTimeout(() => {
+        try {
+          // Make the computer move
+          const move = computerPlayerRef.current.makeMove();
+
+          if (move) {
+            // Update move history
+            setMoves((prev) => [...prev, move]);
+            setCurrentMoveIndex((prev) => prev + 1);
+
+            // Switch player
+            setCurrentPlayer("w");
+
+            // Update game statistics
+            updateGameStatsAfterMove(move);
+
+            // Update board visualization if needed - the board should
+            // automatically update when the game state changes, but we can
+            // explicitly update the position if we have a specific FEN
+            if (boardRef.current && boardRef.current.getFEN) {
+              const currentFEN = game.fen();
+              boardRef.current.loadPosition(currentFEN, moves);
+            }
+
+            // Check for game end
+            checkGameEnd();
+          }
+        } catch (error) {
+          console.error("Error making computer move:", error);
+        } finally {
+          setIsComputerThinking(false);
+        }
+      }, thinkingTime);
+
+      return () => clearTimeout(timerId);
+    }
+  }, [currentPlayer, gameStarted, gameEndState, appSettings.gameMode]);
+
+  // Helper to update game stats after a move
+  const updateGameStatsAfterMove = (move) => {
+    setGameStats((prev) => {
+      const updatedStats = {
+        ...prev,
+        moveCount: prev.moveCount + 1,
+      };
+
+      // Add captured piece if any
+      if (move.captured) {
+        const capturedPiece = {
+          type: move.captured,
+          color: move.color === "w" ? "b" : "w",
+        };
+
+        const captureList = capturedPiece.color === "w" ? "white" : "black";
+        updatedStats.capturedPieces = {
+          ...prev.capturedPieces,
+          [captureList]: [...prev.capturedPieces[captureList], capturedPiece],
+        };
+      }
+
+      // Count checks
+      if (move.flags && move.flags.includes("c")) {
+        updatedStats.checks = prev.checks + 1;
+      }
+
+      return updatedStats;
+    });
+  };
 
   // Callback for move changes from the chess board
   const handleMoveChange = useCallback(
@@ -160,27 +261,40 @@ export const GameProvider = ({ children }) => {
     // Reset game end state
     setGameEndState(null);
 
+    // Initialize computer player if in computer mode
+    if (appSettings.gameMode === "computer") {
+      computerPlayerRef.current = new ComputerPlayer(
+        game,
+        appSettings.computerDifficulty
+      );
+    }
+
     // Mark game as started (hide the selection overlay)
     setGameStarted(true);
-  }, []);
+  }, [appSettings.gameMode, appSettings.computerDifficulty]);
 
   // Undo move
   const handleUndoMove = useCallback(() => {
-    if (boardRef.current) {
-      boardRef.current.undoMove();
-    }
+    // In computer mode, undo two moves to get back to human's turn
+    const movesToUndo = appSettings.gameMode === "computer" ? 2 : 1;
 
-    // Switch player back
-    if (moves.length > 0) {
-      setCurrentPlayer((prev) => (prev === "w" ? "b" : "w"));
+    for (let i = 0; i < movesToUndo; i++) {
+      if (boardRef.current) {
+        boardRef.current.undoMove();
+      }
 
-      // Update statistics
-      setGameStats((prev) => ({
-        ...prev,
-        moveCount: Math.max(0, prev.moveCount - 1),
-      }));
+      // Switch player back
+      if (moves.length > 0) {
+        setCurrentPlayer("w");
+
+        // Update statistics
+        setGameStats((prev) => ({
+          ...prev,
+          moveCount: Math.max(0, prev.moveCount - movesToUndo),
+        }));
+      }
     }
-  }, [moves.length]);
+  }, [moves.length, appSettings.gameMode]);
 
   // Flip board
   const handleFlipBoard = useCallback(() => {
@@ -269,6 +383,14 @@ export const GameProvider = ({ children }) => {
             boardRef.current.loadPosition(savedGame.fen, savedGame.moves);
           }
 
+          // Reinitialize computer player if needed
+          if (savedGame.gameMode === "computer") {
+            computerPlayerRef.current = new ComputerPlayer(
+              loadedGame,
+              savedGame.computerDifficulty || appSettings.computerDifficulty
+            );
+          }
+
           // Mark game as started
           setGameStarted(true);
 
@@ -282,7 +404,7 @@ export const GameProvider = ({ children }) => {
       console.error("Error loading game:", error);
       showNotification("Error loading game", "error");
     }
-  }, [showNotification]);
+  }, [showNotification, appSettings.computerDifficulty]);
 
   // Apply settings
   const handleApplySettings = useCallback(
@@ -300,6 +422,15 @@ export const GameProvider = ({ children }) => {
           ...newSettings,
         })
       );
+
+      // Update computer difficulty if it changed
+      if (
+        computerPlayerRef.current &&
+        newSettings.computerDifficulty &&
+        newSettings.computerDifficulty !== appSettings.computerDifficulty
+      ) {
+        computerPlayerRef.current.setDifficulty(newSettings.computerDifficulty);
+      }
 
       showNotification("Settings applied", "success");
     },
@@ -388,6 +519,47 @@ export const GameProvider = ({ children }) => {
     return timeMap[appSettings.timeControl] || 600;
   };
 
+  // Check game end condition
+  const checkGameEnd = useCallback(() => {
+    if (game.isGameOver()) {
+      let result = {
+        isOver: true,
+        title: "",
+        message: "",
+      };
+
+      if (game.isCheckmate()) {
+        const winner = game.turn() === "w" ? "Schwarz" : "Weiß";
+        const winnerColor = game.turn() === "w" ? "b" : "w";
+
+        result.title = "Schachmatt!";
+        result.message = `${winner} gewinnt durch Schachmatt.`;
+        result.winner = winnerColor;
+        result.reason = "checkmate";
+      } else if (game.isDraw()) {
+        result.title = "Remis!";
+
+        if (game.isStalemate()) {
+          result.message = "Patt: Der Spieler am Zug hat keine gültigen Züge.";
+          result.reason = "stalemate";
+        } else if (game.isThreefoldRepetition()) {
+          result.message = "Dreifache Stellungswiederholung.";
+          result.reason = "repetition";
+        } else if (game.isInsufficientMaterial()) {
+          result.message = "Ungenügendes Material für einen Sieg.";
+          result.reason = "insufficient";
+        } else if (game.isDraw()) {
+          result.message = "50-Züge-Regel oder vereinbartes Remis.";
+          result.reason = "fifty-move";
+        }
+      }
+
+      if (result.isOver) {
+        handleGameEnd(result);
+      }
+    }
+  }, [game, handleGameEnd]);
+
   // Context value
   const value = {
     game,
@@ -399,6 +571,7 @@ export const GameProvider = ({ children }) => {
     appSettings,
     boardRef,
     gameStarted,
+    isComputerThinking,
     setGameStarted,
     handleMoveChange,
     handleNewGame,
