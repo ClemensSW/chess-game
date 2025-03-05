@@ -132,7 +132,7 @@ function AppContent() {
           mb: 4,
         }}
       >
-        <Grid2 sx={{ flexGrow: 1 }} container spacing={3}>
+        <Grid2 container spacing={3}>
           {/* Chess Board */}
           <Grid2 item xs={12} md={8} lg={8}>
             <ChessBoardContainer isMobile={isMobile} />
@@ -167,11 +167,9 @@ function AppContent() {
             <SidebarControls />
           </Grid2>
         </Grid2>
-
-        {/* Footer */}
-        <AppFooter />
       </Container>
-
+      {/* Footer */}
+      <AppFooter />
       {/* Dialogs */}
       <AnimatePresence>
         {/* Game End Dialog */}

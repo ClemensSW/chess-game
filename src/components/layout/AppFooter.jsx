@@ -1,6 +1,13 @@
-// src/components/layout/AppFooter.jsx
 import React from "react";
-import { Box, Paper, Typography, IconButton, alpha } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  IconButton,
+  alpha,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 
 // Icons
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -11,6 +18,9 @@ import InfoIcon from "@mui/icons-material/Info";
 const APP_VERSION = "2.0.0";
 
 const AppFooter = () => {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("sm")); // Prüft, ob der Bildschirm größer als "sm" ist
+
   return (
     <Box
       component={Paper}
@@ -18,7 +28,7 @@ const AppFooter = () => {
       sx={{
         mt: 4,
         p: 2,
-        borderRadius: 3,
+        borderRadius: 0,
         textAlign: "center",
         backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.6),
         backdropFilter: "blur(10px)",
@@ -27,6 +37,9 @@ const AppFooter = () => {
         alignItems: "center",
         flexDirection: { xs: "column", sm: "row" },
         gap: 2,
+        width: "100%",
+        position: { xs: "static", md: "absolute" },
+        bottom: 0,
       }}
     >
       <Typography variant="body2" color="text.secondary">

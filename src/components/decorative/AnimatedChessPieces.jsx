@@ -162,7 +162,6 @@ const AnimatedChessPieces = () => {
           component={motion.div}
           animate={piece.animation}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
           transition={{ duration: 1, delay: index * 0.1 }}
           sx={{
             position: "absolute",
