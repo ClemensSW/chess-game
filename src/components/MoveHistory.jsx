@@ -29,7 +29,7 @@ const MoveHistory = ({ moves = [], onMoveSelect, currentMoveIndex = -1 }) => {
     });
   }
 
-  // Für einfacheres Styling und besseres Verständnis
+  // Erweiterte Funktion zum Hinzufügen von Symbolen für Figuren
   const getSymbolForPiece = (move) => {
     if (!move) return "";
 
@@ -37,27 +37,33 @@ const MoveHistory = ({ moves = [], onMoveSelect, currentMoveIndex = -1 }) => {
     const moveString =
       typeof move === "string" ? move : move.san || move.toString();
 
+    // Detaillierte Symbolkarte
     const pieceSymbols = {
-      K: "♔", // König
-      Q: "♕", // Dame
-      R: "♖", // Turm
-      B: "♗", // Läufer
-      N: "♘", // Springer
-      // Keine Symbole für Bauern notwendig
+      K: "♔", // König (Weiß)
+      Q: "♕", // Dame (Weiß)
+      R: "♖", // Turm (Weiß)
+      B: "♗", // Läufer (Weiß)
+      N: "♘", // Springer (Weiß)
+      P: "♙", // Bauer (Weiß)
     };
 
-    // Einige Beispiele für spezielle Züge
+    // Spezielle Züge wie Rochaden
     if (moveString === "O-O") return "0-0"; // Kurze Rochade
     if (moveString === "O-O-O") return "0-0-0"; // Lange Rochade
 
-    // Fügt das passende Symbol hinzu, falls es ein Nicht-Bauer ist
+    // Besondere Behandlung für Bauernzüge (ohne Buchstaben)
+    if (moveString.length === 2 || moveString.includes("x")) {
+      return "♙" + moveString;
+    }
+
+    // Suche nach dem Figurenbuchstaben am Anfang
     for (const [piece, symbol] of Object.entries(pieceSymbols)) {
       if (moveString.startsWith(piece)) {
         return symbol + moveString.substring(1);
       }
     }
 
-    return moveString; // Bauernzug oder unerkannter Zug
+    return moveString; // Fallback für unerwartete Fälle
   };
 
   // Automatisches Scrollen zum aktuellen Zug
