@@ -3,8 +3,8 @@ import React from "react";
 import { Box } from "@mui/material";
 
 // Components
-import ChessTimer from "../ChessTimer";
-import MoveHistory from "../MoveHistory";
+import ChessTimer from "../ChessTimer/ChessTimer";
+import MoveHistory from "../MoveHistory/MoveHistory";
 
 // Hooks
 import { useGame } from "../../contexts/GameContext";
