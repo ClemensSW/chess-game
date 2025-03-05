@@ -1,4 +1,4 @@
-// src/components/ChessSquare.jsx - Verbesserte Version
+// src/components/ChessSquare.jsx - Optimierte Version
 import React from "react";
 import { Grid, Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
@@ -86,12 +86,9 @@ const ChessSquare = ({
   const renderMoveIndicator = () => {
     if (!isValidMove) return null;
 
+    // Vereinfachte Version ohne Motion-Animation für bessere Performance
     return (
       <Box
-        component={motion.div}
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: (0.2 * (4 - animationSpeed)) / 3 }}
         sx={{
           position: "absolute",
           width: piece ? "85%" : "30%",
@@ -102,6 +99,9 @@ const ChessSquare = ({
             : "rgba(0, 0, 0, 0.15)",
           pointerEvents: "none",
           zIndex: 1,
+          transform: "scale(1)",
+          opacity: 1,
+          transition: "transform 0.2s ease, opacity 0.2s ease",
         }}
       />
     );
@@ -169,21 +169,6 @@ const ChessSquare = ({
   const renderPiece = () => {
     if (!piece) return null;
 
-    // Animationsgeschwindigkeit anpassen
-    const getAnimationDuration = () => {
-      // animationSpeed ist 1, 2 oder 3 (langsam, mittel, schnell)
-      switch (animationSpeed) {
-        case 1:
-          return 0.5; // Langsam
-        case 2:
-          return 0.3; // Mittel
-        case 3:
-          return 0.15; // Schnell
-        default:
-          return 0.3;
-      }
-    };
-
     // Moderne Schachfiguren mit Unicode-Symbolen
     const pieceSymbols = {
       standard: {
@@ -217,17 +202,18 @@ const ChessSquare = ({
       return pieceSymbols[style][piece.type][piece.color];
     };
 
+    // Vereinfachte Version ohne Motion-Animation für bessere Performance
     return (
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: getAnimationDuration() }}
-        style={{
+      <Box
+        sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           width: "100%",
           height: "100%",
+          transform: "scale(1)",
+          opacity: 1,
+          transition: "transform 0.2s ease, opacity 0.2s ease",
         }}
       >
         <Typography
@@ -253,7 +239,7 @@ const ChessSquare = ({
         >
           {getSymbol()}
         </Typography>
-      </motion.div>
+      </Box>
     );
   };
 
@@ -293,4 +279,15 @@ const ChessSquare = ({
   );
 };
 
-export default React.memo(ChessSquare);
+// Optimierte Version mit Custom Equality Funktion
+export default React.memo(ChessSquare, (prevProps, nextProps) => {
+  return (
+    prevProps.piece === nextProps.piece &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isValidMove === nextProps.isValidMove &&
+    prevProps.isLastMoveFrom === nextProps.isLastMoveFrom &&
+    prevProps.isLastMoveTo === nextProps.isLastMoveTo &&
+    prevProps.isInCheck === nextProps.isInCheck &&
+    prevProps.isHovered === nextProps.isHovered
+  );
+});

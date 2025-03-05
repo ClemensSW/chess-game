@@ -1,5 +1,11 @@
-// src/components/ChessBoard.jsx - Aktualisierte Version mit professioneller Bauernumwandlung
-import React, { useState, useEffect, useCallback, useRef } from "react";
+// src/components/ChessBoard.jsx - Optimierte Version
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { Grid, Paper, Box, Typography, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { Chess } from "chess.js";
@@ -96,7 +102,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
   }, [game]);
 
   // Funktion zum Finden des Königs im Schach
-  const findKingInCheck = () => {
+  const findKingInCheck = useCallback(() => {
     if (game.isCheck()) {
       // Finde das Feld des Königs, der im Schach steht
       const board = game.board();
@@ -112,72 +118,81 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
       }
     }
     return null;
-  };
+  }, [game]);
 
   // Aktualisiere das Brettlayout
-  const updateBoardPosition = () => {
+  const updateBoardPosition = useCallback(() => {
     try {
       const board = game.board();
       setBoardPosition(board);
     } catch (error) {
       console.error("Fehler beim Aktualisieren der Brettposition:", error);
     }
-  };
+  }, [game]);
 
   // Sound abspielen
-  const playSound = (soundType) => {
-    if (!soundEffects) return;
+  const playSound = useCallback(
+    (soundType) => {
+      if (!soundEffects) return;
 
-    try {
-      switch (soundType) {
-        case "move":
-          if (enableMoveSound)
-            moveAudioRef.current
+      try {
+        switch (soundType) {
+          case "move":
+            if (enableMoveSound)
+              moveAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "capture":
+            if (enableCaptureSound)
+              captureAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "check":
+            if (enableCheckSound)
+              checkAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "castle":
+            if (enableMoveSound)
+              castleAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "promote":
+            if (enableMoveSound)
+              promoteAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "gameEnd":
+            if (enableGameEndSound)
+              gameEndAudioRef.current
+                .play()
+                .catch((e) => console.error("Error playing sound:", e));
+            break;
+          case "illegal":
+            illegalAudioRef.current
               .play()
               .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "capture":
-          if (enableCaptureSound)
-            captureAudioRef.current
-              .play()
-              .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "check":
-          if (enableCheckSound)
-            checkAudioRef.current
-              .play()
-              .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "castle":
-          if (enableMoveSound)
-            castleAudioRef.current
-              .play()
-              .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "promote":
-          if (enableMoveSound)
-            promoteAudioRef.current
-              .play()
-              .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "gameEnd":
-          if (enableGameEndSound)
-            gameEndAudioRef.current
-              .play()
-              .catch((e) => console.error("Error playing sound:", e));
-          break;
-        case "illegal":
-          illegalAudioRef.current
-            .play()
-            .catch((e) => console.error("Error playing sound:", e));
-          break;
-        default:
-          break;
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error("Fehler beim Abspielen des Sounds:", error);
       }
-    } catch (error) {
-      console.error("Fehler beim Abspielen des Sounds:", error);
-    }
-  };
+    },
+    [
+      soundEffects,
+      enableMoveSound,
+      enableCaptureSound,
+      enableCheckSound,
+      enableGameEndSound,
+    ]
+  );
 
   // Berechnet alle gültigen Züge für ein ausgewähltes Feld
   const calculateValidMoves = useCallback(
@@ -295,6 +310,9 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         const newGame = new Chess(game.fen());
         setGame(newGame);
 
+        // Expliziter Aufruf von checkGameEnd nach einer kurzen Verzögerung
+        setTimeout(() => checkGameEnd(), 0);
+
         return true;
       } catch (error) {
         console.error("Fehler beim Ausführen des Zuges:", error);
@@ -302,7 +320,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         return false;
       }
     },
-    [game, moveHistory, onMoveChange]
+    [game, moveHistory, onMoveChange, playSound]
   );
 
   // Klick-Handler für Felder
@@ -353,6 +371,14 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
 
   // Prüft, ob das Spiel vorbei ist
   const checkGameEnd = useCallback(() => {
+    // Debug-Logging hinzufügen
+    console.log("Checking game end state:", {
+      isGameOver: game.isGameOver(),
+      isCheckmate: game.isCheckmate(),
+      isDraw: game.isDraw(),
+      turn: game.turn(),
+    });
+
     if (game.isGameOver()) {
       let result = {
         isOver: true,
@@ -370,6 +396,8 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         result.reason = "checkmate";
 
         playSound("gameEnd");
+
+        console.log("Checkmate detected, result:", result);
       } else if (game.isDraw()) {
         result.title = "Remis!";
 
@@ -391,10 +419,11 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
       }
 
       if (result.isOver && onGameEnd) {
+        console.log("Calling onGameEnd with:", result);
         onGameEnd(result);
       }
     }
-  }, [game, onGameEnd]);
+  }, [game, onGameEnd, playSound]);
 
   // Neues Spiel starten
   const newGame = useCallback(() => {
@@ -438,7 +467,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
       console.error("Fehler beim Rückgängigmachen des Zuges:", error);
       return false;
     }
-  }, [game, moveHistory, onMoveChange]);
+  }, [game, moveHistory, onMoveChange, updateBoardPosition, playSound]);
 
   // Brettorientierung ändern
   const flipBoard = useCallback(() => {
@@ -446,29 +475,32 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
   }, []);
 
   // Position aus FEN laden
-  const loadPosition = useCallback((fen, moves = []) => {
-    try {
-      const loadedGame = new Chess();
-      const success = loadedGame.load(fen);
+  const loadPosition = useCallback(
+    (fen, moves = []) => {
+      try {
+        const loadedGame = new Chess();
+        const success = loadedGame.load(fen);
 
-      if (success) {
-        setGame(loadedGame);
-        setMoveHistory(moves || []);
-        setSelectedSquare(null);
-        setValidMoves([]);
-        setLastMove(null);
-        setCheckSquare(findKingInCheck());
-        setPromotionSquare(null);
-        setPendingPromotion(null);
-        updateBoardPosition();
-        return true;
+        if (success) {
+          setGame(loadedGame);
+          setMoveHistory(moves || []);
+          setSelectedSquare(null);
+          setValidMoves([]);
+          setLastMove(null);
+          setCheckSquare(findKingInCheck());
+          setPromotionSquare(null);
+          setPendingPromotion(null);
+          updateBoardPosition();
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error("Fehler beim Laden der Position:", error);
+        return false;
       }
-      return false;
-    } catch (error) {
-      console.error("Fehler beim Laden der Position:", error);
-      return false;
-    }
-  }, []);
+    },
+    [findKingInCheck, updateBoardPosition]
+  );
 
   // Zu bestimmtem Zug springen
   const goToMove = useCallback(
@@ -496,7 +528,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         return false;
       }
     },
-    [moveHistory]
+    [moveHistory, findKingInCheck, updateBoardPosition]
   );
 
   // Berechne Board-Size basierend auf Einstellungen und Viewport
@@ -522,7 +554,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
   };
 
   // Farben für das Brett basierend auf den Themeeinstellungen
-  const getBoardColors = () => {
+  const getBoardColors = useCallback(() => {
     if (colorBlindMode) {
       return {
         light: "#FFFFFF",
@@ -582,10 +614,10 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
     };
 
     return themeColors[boardTheme] || themeColors.classic;
-  };
+  }, [boardTheme, highContrast, colorBlindMode]);
 
   // Berechne Position für den Promotion-Dialog
-  const getPromotionDialogPosition = () => {
+  const getPromotionDialogPosition = useCallback(() => {
     if (!pendingPromotion) return null;
 
     const { to, color } = pendingPromotion;
@@ -607,27 +639,33 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
       col,
       onTop,
     };
-  };
+  }, [pendingPromotion, boardOrientation]);
 
-  // Rendere das Brett
-  const renderBoard = () => {
-    const boardColors = getBoardColors();
-    let boardArray = [...Array(8)].map(() => Array(8).fill(null));
+  // Memorisiertes Boardarray für weniger Neuberechnungen
+  const boardArray = useMemo(() => {
+    let array = [...Array(8)].map(() => Array(8).fill(null));
 
     // Fülle das Brett mit den Figuren
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const piece = boardPosition[row] ? boardPosition[row][col] : null;
         if (piece) {
-          boardArray[row][col] = piece;
+          array[row][col] = piece;
         }
       }
     }
 
     // Drehe das Brett, falls notwendig
     if (boardOrientation === "black") {
-      boardArray = boardArray.reverse().map((row) => row.reverse());
+      array = array.reverse().map((row) => row.reverse());
     }
+
+    return array;
+  }, [boardPosition, boardOrientation]);
+
+  // Rendere das Brett
+  const renderBoard = useCallback(() => {
+    const boardColors = getBoardColors();
 
     return (
       <Grid container spacing={0} sx={{ width: "100%", height: "100%" }}>
@@ -676,7 +714,21 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         )}
       </Grid>
     );
-  };
+  }, [
+    boardArray,
+    boardOrientation,
+    selectedSquare,
+    validMoves,
+    lastMove,
+    checkSquare,
+    hoveredSquare,
+    getBoardColors,
+    handleSquareClick,
+    handleSquareHover,
+    pieceStyle,
+    showCoordinates,
+    animationSpeed,
+  ]);
 
   // Berechne Boardgröße
   const sizingProps = getBoardSize();
