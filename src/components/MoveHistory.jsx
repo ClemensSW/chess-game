@@ -1,4 +1,4 @@
-// src/components/MoveHistory.jsx - Modernisierte Version
+// src/components/MoveHistory.jsx - Verbessertes Design
 import React, { useRef, useEffect } from "react";
 import {
   Paper,
@@ -9,8 +9,10 @@ import {
   Divider,
   Chip,
   useTheme,
+  alpha,
 } from "@mui/material";
 import HistoryIcon from "@mui/icons-material/History";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { motion } from "framer-motion";
 
 const MoveHistory = ({ moves = [], onMoveSelect, currentMoveIndex = -1 }) => {
@@ -70,20 +72,43 @@ const MoveHistory = ({ moves = [], onMoveSelect, currentMoveIndex = -1 }) => {
     }
   }, [currentMoveIndex, moves.length]);
 
+  // Container-Animation
+  const containerVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, staggerChildren: 0.1 },
+    },
+  };
+
+  // Element-Animation
+  const itemVariants = {
+    hidden: { opacity: 0, x: -5 },
+    visible: { opacity: 1, x: 0 },
+  };
+
   return (
     <Paper
       component={motion.div}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
       elevation={3}
       sx={{
-        p: 2,
-        maxHeight: "300px",
+        p: 0,
+        maxHeight: "350px",
         overflowY: "auto",
-        borderRadius: 2,
+        borderRadius: 3,
         backgroundColor: (theme) =>
-          theme.palette.mode === "dark" ? "#1e2023" : "#fff",
+          theme.palette.mode === "dark"
+            ? alpha("#1e2023", 0.9)
+            : alpha("#fff", 0.95),
+        boxShadow: (theme) =>
+          theme.palette.mode === "dark"
+            ? "0px 8px 25px rgba(0, 0, 0, 0.25)"
+            : "0px 8px 25px rgba(0, 0, 0, 0.1)",
+        border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.08)}`,
       }}
     >
       <Box
@@ -91,139 +116,202 @@ const MoveHistory = ({ moves = [], onMoveSelect, currentMoveIndex = -1 }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 1,
+          borderBottom: (theme) =>
+            `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          p: 2,
+          backgroundColor: (theme) =>
+            theme.palette.mode === "dark"
+              ? alpha(theme.palette.background.paper, 0.4)
+              : alpha(theme.palette.primary.light, 0.05),
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            color: (theme) => theme.palette.primary.main,
+          }}
+        >
+          <HistoryIcon sx={{ mr: 1, fontSize: "1.25rem" }} />
           Zughistorie
         </Typography>
 
         <Chip
-          icon={<HistoryIcon />}
+          icon={<SwapVertIcon />}
           label={`${moves.length} Züge`}
           size="small"
           color="primary"
           variant="outlined"
+          sx={{
+            borderRadius: "12px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+            "& .MuiChip-label": {
+              fontWeight: 600,
+              px: 1,
+            },
+          }}
         />
       </Box>
-
-      <Divider sx={{ mb: 1 }} />
 
       {formattedMoves.length === 0 ? (
         <Box
           sx={{
-            py: 3,
+            py: 5,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
             color: "text.secondary",
-            bgcolor: "background.default",
+            bgcolor: (theme) => alpha(theme.palette.background.default, 0.5),
             borderRadius: 1,
           }}
         >
           <HistoryIcon sx={{ fontSize: 40, mb: 1, opacity: 0.5 }} />
-          <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+          <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
             Noch keine Züge vorhanden
           </Typography>
-          <Typography variant="caption" sx={{ mt: 1 }}>
-            Die Zughistorie wird hier angezeigt
+          <Typography
+            variant="body2"
+            sx={{ maxWidth: "80%", textAlign: "center" }}
+          >
+            Die Zughistorie wird hier angezeigt, sobald du einen Zug ausführst
           </Typography>
         </Box>
       ) : (
-        <List ref={listRef} sx={{ pl: 1, pr: 1 }}>
+        <List ref={listRef} sx={{ p: 0 }}>
           {formattedMoves.map((movePair) => (
-            <ListItem
-              key={movePair.index}
-              disablePadding
-              sx={{
-                display: "flex",
-                mb: 0.5,
-                borderRadius: 1,
-                "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                },
-              }}
-            >
-              <Box
+            <motion.div key={movePair.index} variants={itemVariants}>
+              <ListItem
+                disablePadding
                 sx={{
-                  width: "15%",
-                  fontWeight: "bold",
-                  color: "text.secondary",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {movePair.index}.
-              </Box>
-
-              <Box
-                data-move-index={2 * movePair.index - 2}
-                onClick={() =>
-                  onMoveSelect && onMoveSelect(2 * movePair.index - 2)
-                }
-                sx={{
-                  width: "42.5%",
-                  py: 0.5,
-                  px: 1,
-                  cursor: "pointer",
-                  borderRadius: 1,
-                  bgcolor:
-                    currentMoveIndex === 2 * movePair.index - 2
-                      ? theme.palette.mode === "dark"
-                        ? "rgba(255, 255, 255, 0.1)"
-                        : "rgba(0, 0, 0, 0.08)"
-                      : "transparent",
-                  fontWeight:
-                    currentMoveIndex === 2 * movePair.index - 2
-                      ? "bold"
-                      : "normal",
+                  borderBottom: (theme) =>
+                    `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                  "&:last-child": {
+                    borderBottom: "none",
+                  },
+                  transition: "background-color 0.2s ease",
+                  position: "relative",
+                  overflow: "hidden",
                   "&:hover": {
-                    backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? "rgba(255, 255, 255, 0.15)"
-                        : "rgba(0, 0, 0, 0.12)",
+                    backgroundColor: (theme) =>
+                      alpha(theme.palette.action.hover, 0.1),
                   },
                 }}
               >
-                {getSymbolForPiece(movePair.white)}
-              </Box>
-
-              {movePair.black && (
                 <Box
-                  data-move-index={2 * movePair.index - 1}
+                  sx={{
+                    width: "15%",
+                    fontWeight: "bold",
+                    color: (theme) => alpha(theme.palette.text.secondary, 0.9),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRight: (theme) =>
+                      `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.background.paper, 0.3)
+                        : alpha(theme.palette.background.default, 0.5),
+                    py: 1.5,
+                  }}
+                >
+                  {movePair.index}.
+                </Box>
+
+                <Box
+                  data-move-index={2 * movePair.index - 2}
                   onClick={() =>
-                    onMoveSelect && onMoveSelect(2 * movePair.index - 1)
+                    onMoveSelect && onMoveSelect(2 * movePair.index - 2)
                   }
                   sx={{
                     width: "42.5%",
-                    py: 0.5,
-                    px: 1,
+                    py: 1.5,
+                    px: 1.5,
                     cursor: "pointer",
                     borderRadius: 1,
-                    bgcolor:
-                      currentMoveIndex === 2 * movePair.index - 1
-                        ? theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.1)"
-                          : "rgba(0, 0, 0, 0.08)"
-                        : "transparent",
+                    position: "relative",
                     fontWeight:
-                      currentMoveIndex === 2 * movePair.index - 1
-                        ? "bold"
-                        : "normal",
+                      currentMoveIndex === 2 * movePair.index - 2 ? 700 : 500,
+                    color:
+                      currentMoveIndex === 2 * movePair.index - 2
+                        ? (theme) => theme.palette.primary.main
+                        : "text.primary",
                     "&:hover": {
-                      backgroundColor:
+                      backgroundColor: (theme) =>
                         theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.15)"
-                          : "rgba(0, 0, 0, 0.12)",
+                          ? alpha(theme.palette.primary.main, 0.1)
+                          : alpha(theme.palette.primary.main, 0.05),
                     },
+                    "&::after":
+                      currentMoveIndex === 2 * movePair.index - 2
+                        ? {
+                            content: '""',
+                            position: "absolute",
+                            left: 0,
+                            top: "25%",
+                            height: "50%",
+                            width: "3px",
+                            backgroundColor: (theme) =>
+                              theme.palette.primary.main,
+                            borderRadius: "0 2px 2px 0",
+                          }
+                        : {},
+                    transition: "all 0.2s ease",
                   }}
                 >
-                  {getSymbolForPiece(movePair.black)}
+                  {getSymbolForPiece(movePair.white)}
                 </Box>
-              )}
-            </ListItem>
+
+                {movePair.black && (
+                  <Box
+                    data-move-index={2 * movePair.index - 1}
+                    onClick={() =>
+                      onMoveSelect && onMoveSelect(2 * movePair.index - 1)
+                    }
+                    sx={{
+                      width: "42.5%",
+                      py: 1.5,
+                      px: 1.5,
+                      cursor: "pointer",
+                      borderRadius: 1,
+                      position: "relative",
+                      fontWeight:
+                        currentMoveIndex === 2 * movePair.index - 1 ? 700 : 500,
+                      color:
+                        currentMoveIndex === 2 * movePair.index - 1
+                          ? (theme) => theme.palette.secondary.main
+                          : "text.primary",
+                      "&:hover": {
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.secondary.main, 0.1)
+                            : alpha(theme.palette.secondary.main, 0.05),
+                      },
+                      "&::after":
+                        currentMoveIndex === 2 * movePair.index - 1
+                          ? {
+                              content: '""',
+                              position: "absolute",
+                              right: 0,
+                              top: "25%",
+                              height: "50%",
+                              width: "3px",
+                              backgroundColor: (theme) =>
+                                theme.palette.secondary.main,
+                              borderRadius: "2px 0 0 2px",
+                            }
+                          : {},
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {getSymbolForPiece(movePair.black)}
+                  </Box>
+                )}
+              </ListItem>
+            </motion.div>
           ))}
         </List>
       )}

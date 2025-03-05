@@ -1,64 +1,65 @@
-// src/theme/themeConfig.js
+// src/theme/themeConfig.js - Verbesserte Farbpalette
 import { createTheme } from "@mui/material/styles";
 
-// Shared color palette
+// Neue hochwertige Farbpalette
 const colors = {
   primary: {
-    main: "#1E88E5", // Modern blue
-    light: "#6AB7FF",
-    dark: "#005CB2",
+    main: "#3A5DAE", // Königliches Blau (tiefer, edler)
+    light: "#6281D0",
+    dark: "#2A4480",
     contrastText: "#fff",
   },
   secondary: {
-    main: "#26A69A", // Teal
-    light: "#64D8CB",
-    dark: "#00766C",
+    main: "#E09E45", // Elegantes Gold/Bernstein
+    light: "#F2BD6E",
+    dark: "#BD7B29",
     contrastText: "#fff",
   },
   success: {
-    main: "#66BB6A",
-    light: "#98EE99",
-    dark: "#338A3E",
+    main: "#4CAF50", // Klares Grün
+    light: "#80E27E",
+    dark: "#087F23",
   },
   error: {
-    main: "#F44336",
-    light: "#FF7961",
-    dark: "#BA000D",
+    main: "#D32F2F", // Lebendiges Rot
+    light: "#FF6659",
+    dark: "#9A0007",
   },
   warning: {
-    main: "#FFA726",
-    light: "#FFD95B",
-    dark: "#C77800",
+    main: "#F9A825", // Warmes Gelb
+    light: "#FFD95A",
+    dark: "#C17900",
   },
   info: {
-    main: "#29B6F6",
-    light: "#73E8FF",
-    dark: "#0086C3",
+    main: "#0288D1", // Informatives Blau
+    light: "#5EB8FF",
+    dark: "#005B9F",
   },
   text: {
-    primary: "#212121",
-    secondary: "#757575",
-    disabled: "#9E9E9E",
+    primary: "#263238", // Tieferes Schwarz für bessere Lesbarkeit
+    secondary: "#546E7A",
+    disabled: "#78909C",
   },
   background: {
-    default: "#F5F7FA",
+    default: "#F8F7F5", // Leichter wärmerer Ton als reines Weiß
     paper: "#FFFFFF",
-    dark: "#121212",
-    darkPaper: "#1E1E1E",
+    dark: "#1E2738", // Tiefes Marineblau statt reines Schwarz
+    darkPaper: "#273142",
   },
   chess: {
-    lightSquare: "#F0D9B5", // Classic chess board colors
-    darkSquare: "#B58863",
-    selectedSquare: "#BBCB2B",
-    validMoveLight: "#D5E39A",
-    validMoveDark: "#A3C939",
-    lastMoveLight: "#E6D9A2",
-    lastMoveDark: "#B39C56",
+    // Elegantere und gesättigtere Schachbrettfarben
+    lightSquare: "#EEDCB5", // Creme (wärmer)
+    darkSquare: "#9E7863", // Mahagoni (tiefer)
+    selectedSquare: "#B8E986", // Helles Grün
+    validMoveLight: "#D6EDB9",
+    validMoveDark: "#8BB056",
+    lastMoveLight: "#F8E2A0",
+    lastMoveDark: "#D9B85C",
   },
   divider: "rgba(0, 0, 0, 0.12)",
 };
 
-// Create Light Theme
+// Light-Theme mit den neuen Farben
 const lightTheme = createTheme({
   palette: {
     mode: "light",
@@ -78,27 +79,27 @@ const lightTheme = createTheme({
   typography: {
     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
     h1: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "2.5rem",
     },
     h2: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "2rem",
     },
     h3: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "1.75rem",
     },
     h4: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "1.5rem",
     },
     h5: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "1.25rem",
     },
     h6: {
-      fontWeight: 500,
+      fontWeight: 600,
       fontSize: "1rem",
     },
   },
@@ -114,24 +115,24 @@ const lightTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          boxShadow: "0px 3px 15px rgba(0, 0, 0, 0.05)",
+          borderRadius: 12,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
         },
         elevation1: {
-          boxShadow: "0px 3px 15px rgba(0, 0, 0, 0.05)",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
         },
         elevation2: {
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0px 6px 25px rgba(0, 0, 0, 0.09)",
         },
         elevation3: {
-          boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.12)",
+          boxShadow: "0px 10px 35px rgba(0, 0, 0, 0.12)",
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: "0px 3px 15px rgba(0, 0, 0, 0.05)",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
         },
       },
     },
@@ -139,14 +140,14 @@ const lightTheme = createTheme({
       styleOverrides: {
         root: {
           textTransform: "none",
-          borderRadius: 8,
-          padding: "8px 16px",
-          fontWeight: 500,
+          borderRadius: 10,
+          padding: "10px 20px",
+          fontWeight: 600,
         },
         contained: {
-          boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.12)",
           "&:hover": {
-            boxShadow: "0px 6px 10px rgba(0, 0, 0, 0.15)",
+            boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.18)",
           },
         },
       },
@@ -154,7 +155,7 @@ const lightTheme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          transition: "transform 0.2s ease-in-out",
+          transition: "transform 0.2s ease-in-out, background-color 0.2s ease",
           "&:hover": {
             transform: "scale(1.1)",
           },
@@ -164,14 +165,14 @@ const lightTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
+          borderRadius: 8,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 12,
+          borderRadius: 16,
         },
       },
     },
@@ -183,44 +184,44 @@ const lightTheme = createTheme({
       },
     },
   },
-  chess: colors.chess, // Custom property for chess board colors
+  chess: colors.chess, // Benutzerdefinierte Eigenschaft für Schachbrettfarben
 });
 
-// Create Dark Theme
+// Dark-Theme mit den neuen Farben
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#64B5F6", // Lighter blue for Dark Mode
-      light: "#9BE7FF",
-      dark: "#2286C3",
-      contrastText: "#000",
+      main: "#4D82E5", // Helleres Blau für Dark Mode
+      light: "#80B0FF",
+      dark: "#2C5BBC",
+      contrastText: "#fff",
     },
     secondary: {
-      main: "#4DB6AC", // Lighter teal for Dark Mode
-      light: "#82E9DE",
-      dark: "#00867D",
+      main: "#FFB74D", // Helleres Gold für Dark Mode
+      light: "#FFE97D",
+      dark: "#C88719",
       contrastText: "#000",
     },
     success: {
-      main: "#81C784",
-      light: "#B2F2B6",
-      dark: "#519657",
+      main: "#66BB6A",
+      light: "#98EE99",
+      dark: "#338A3E",
     },
     error: {
-      main: "#E57373",
-      light: "#FFA4A2",
-      dark: "#AF4448",
+      main: "#EF5350",
+      light: "#FF867C",
+      dark: "#B61827",
     },
     warning: {
-      main: "#FFB74D",
-      light: "#FFECB3",
-      dark: "#C88719",
+      main: "#FFCA28",
+      light: "#FFF350",
+      dark: "#C79A00",
     },
     info: {
-      main: "#4FC3F7",
-      light: "#8BF6FF",
-      dark: "#0093C4",
+      main: "#42A5F5",
+      light: "#80D6FF",
+      dark: "#0077C2",
     },
     text: {
       primary: "#FFFFFF",
@@ -228,14 +229,38 @@ const darkTheme = createTheme({
       disabled: "#78909C",
     },
     background: {
-      default: "#121212",
-      paper: "#1E1E1E",
+      default: "#1E2738",
+      paper: "#273142",
     },
     divider: "rgba(255, 255, 255, 0.12)",
   },
   typography: {
-    // Same typography as Light Theme
+    // Gleiche Typografie wie Light-Theme
     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    h1: {
+      fontWeight: 600,
+      fontSize: "2.5rem",
+    },
+    h2: {
+      fontWeight: 600,
+      fontSize: "2rem",
+    },
+    h3: {
+      fontWeight: 600,
+      fontSize: "1.75rem",
+    },
+    h4: {
+      fontWeight: 600,
+      fontSize: "1.5rem",
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: "1.25rem",
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: "1rem",
+    },
   },
   components: {
     MuiCssBaseline: {
@@ -249,7 +274,7 @@ const darkTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 12,
           backgroundColor: colors.background.darkPaper,
         },
       },
@@ -258,24 +283,26 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           textTransform: "none",
-          borderRadius: 8,
+          borderRadius: 10,
+          padding: "10px 20px",
+          fontWeight: 600,
         },
       },
     },
   },
   chess: {
-    // Darker color scheme for chess board in Dark Mode
-    lightSquare: "#ABABAB", // Darker gray for light squares
-    darkSquare: "#5C5C5C", // Darker gray for dark squares
-    selectedSquare: "#7FA650",
+    // Verbesserte Schachbrettfarben für den Dark Mode
+    lightSquare: "#B8B8B8", // Helles Grau
+    darkSquare: "#505050", // Dunkleres Grau
+    selectedSquare: "#7EA553",
     validMoveLight: "#A6BE7E",
     validMoveDark: "#758F45",
-    lastMoveLight: "#A9A9A9",
-    lastMoveDark: "#787878",
+    lastMoveLight: "#C0C0C0",
+    lastMoveDark: "#808080",
   },
 });
 
-// Function to switch between Light and Dark Theme
+// Funktion zum Wechseln zwischen Light- und Dark-Theme
 export const getThemeByMode = (mode) => {
   return mode === "dark" ? darkTheme : lightTheme;
 };
