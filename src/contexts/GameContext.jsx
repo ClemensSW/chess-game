@@ -5,6 +5,7 @@ import React, {
   useState,
   useRef,
   useCallback,
+  useEffect,
 } from "react";
 import { Chess } from "chess.js";
 import { useNotification } from "./NotificationContext";
@@ -27,6 +28,9 @@ export const GameProvider = ({ children }) => {
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [currentPlayer, setCurrentPlayer] = useState("w"); // 'w' for white, 'b' for black
   const [gameEndState, setGameEndState] = useState(null);
+
+  // New state to track if game has started (for overlay)
+  const [gameStarted, setGameStarted] = useState(false);
 
   // Game statistics
   const [gameStats, setGameStats] = useState({
@@ -62,7 +66,7 @@ export const GameProvider = ({ children }) => {
   });
 
   // Load settings from localStorage
-  useState(() => {
+  useEffect(() => {
     const savedSettings = localStorage.getItem("chessSettings");
     if (savedSettings) {
       try {
@@ -75,10 +79,18 @@ export const GameProvider = ({ children }) => {
         console.error("Error loading settings:", error);
       }
     }
-  });
+
+    // Check if we have a previously started game
+    const savedGameJson = localStorage.getItem("savedChessGame");
+    if (savedGameJson) {
+      // Having a saved game doesn't automatically start it,
+      // but we can use this information elsewhere if needed
+      console.log("Found saved game");
+    }
+  }, []);
 
   // Save settings to localStorage when they change
-  useState(() => {
+  useEffect(() => {
     localStorage.setItem("chessSettings", JSON.stringify(appSettings));
   }, [appSettings]);
 
@@ -147,6 +159,9 @@ export const GameProvider = ({ children }) => {
 
     // Reset game end state
     setGameEndState(null);
+
+    // Mark game as started (hide the selection overlay)
+    setGameStarted(true);
   }, []);
 
   // Undo move
@@ -192,6 +207,8 @@ export const GameProvider = ({ children }) => {
         },
         timestamp: new Date().toISOString(),
         appVersion: APP_VERSION,
+        gameMode: appSettings.gameMode,
+        computerDifficulty: appSettings.computerDifficulty,
       };
 
       localStorage.setItem("savedChessGame", JSON.stringify(gameState));
@@ -200,7 +217,7 @@ export const GameProvider = ({ children }) => {
       console.error("Error saving:", error);
       showNotification("Error saving game", "error");
     }
-  }, [moves, currentPlayer, gameStats, showNotification]);
+  }, [moves, currentPlayer, gameStats, showNotification, appSettings]);
 
   // Load game
   const handleLoadGame = useCallback(() => {
@@ -237,10 +254,23 @@ export const GameProvider = ({ children }) => {
             });
           }
 
+          // Restore game mode settings if available
+          if (savedGame.gameMode) {
+            setAppSettings((prev) => ({
+              ...prev,
+              gameMode: savedGame.gameMode,
+              computerDifficulty:
+                savedGame.computerDifficulty || prev.computerDifficulty,
+            }));
+          }
+
           // Update board
           if (boardRef.current) {
             boardRef.current.loadPosition(savedGame.fen, savedGame.moves);
           }
+
+          // Mark game as started
+          setGameStarted(true);
 
           showNotification("Game successfully loaded", "success");
         } catch (error) {
@@ -368,6 +398,8 @@ export const GameProvider = ({ children }) => {
     gameStats,
     appSettings,
     boardRef,
+    gameStarted,
+    setGameStarted,
     handleMoveChange,
     handleNewGame,
     handleUndoMove,

@@ -1,4 +1,4 @@
-// src/App.jsx - Refactored version
+// src/App.jsx - Updated with Game Mode Selection
 import React, { useState } from "react";
 import {
   Container,
@@ -6,7 +6,7 @@ import {
   CssBaseline,
   useMediaQuery,
   Box,
-  alpha, // Added this import
+  alpha,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,6 +20,7 @@ import SidebarControls from "./components/controls/SidebarControls";
 import { GameEndDialog } from "./components/game-end";
 import SettingsDialog from "./components/settings/SettingsDialog";
 import ChessTutorial from "./components/tutorial/ChessTutorial";
+import GameModeSelection from "./components/GameModeSelection"; // Import the new component
 
 // Context Providers
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
@@ -39,6 +40,7 @@ function AppContent() {
     gameStats,
     appSettings,
     handleApplySettings,
+    gameStarted, // Get if game has started from context
   } = useGame();
 
   // Media queries for responsive layout
@@ -83,6 +85,9 @@ function AppContent() {
         position: "relative",
       }}
     >
+      {/* Game Mode Selection Overlay - Show when game has not started */}
+      <AnimatePresence>{!gameStarted && <GameModeSelection />}</AnimatePresence>
+
       {/* App Header */}
       <AppHeader
         onDrawerToggle={handleDrawerToggle}
