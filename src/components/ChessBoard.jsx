@@ -77,10 +77,22 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
     // Exportiere Funktionen über boardRef
     if (boardRef) {
       boardRef.current = {
-        newGame,
+        newGame: () => {
+          const freshGame = new Chess();
+          setGame(freshGame);
+          setSelectedSquare(null);
+          setMoveHistory([]);
+          setValidMoves([]);
+          setLastMove(null);
+          setCheckSquare(null);
+          setPromotionSquare(null);
+          setPendingPromotion(null);
+          updateBoardPosition();
+          return freshGame; // Gib das neue Spielobjekt zurück
+        },
         undoMove,
         flipBoard,
-        getGame: () => game,
+        getGame: () => game, // Wichtige Funktion, um das aktuelle Spielobjekt zu erhalten
         getMoveHistory: () => moveHistory,
         getFEN: () => game.fen(),
         loadPosition,
@@ -313,7 +325,7 @@ const ChessBoard = ({ onMoveChange, boardRef, onGameEnd, settings = {} }) => {
         // Expliziter Aufruf von checkGameEnd nach einer kurzen Verzögerung
         setTimeout(() => checkGameEnd(), 0);
 
-        return true;
+        return moveResult; // Gib das vollständige Zugobjekt zurück, nicht nur true
       } catch (error) {
         console.error("Fehler beim Ausführen des Zuges:", error);
         playSound("illegal");

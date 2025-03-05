@@ -1,0 +1,344 @@
+/* Chess Timer CSS Styles
+ * Converted from MUI React styles to pure CSS
+ */
+
+:root {
+  /* Light theme variables */
+  --primary-main: #3a5dae;
+  --primary-light: #6281d0;
+  --primary-dark: #2a4480;
+  --secondary-main: #e09e45;
+  --secondary-light: #f2bd6e;
+  --secondary-dark: #bd7b29;
+  --error-main: #d32f2f;
+  --warning-main: #f9a825;
+  --text-primary: #263238;
+  --text-secondary: #546e7a;
+  --background-default: #f8f7f5;
+  --background-paper: #ffffff;
+  --divider-color: rgba(0, 0, 0, 0.12);
+
+  /* Dark theme variables */
+  --dark-primary-main: #4d82e5;
+  --dark-primary-light: #80b0ff;
+  --dark-secondary-main: #ffb74d;
+  --dark-secondary-light: #ffe97d;
+  --dark-error-main: #ef5350;
+  --dark-warning-main: #ffca28;
+  --dark-text-primary: #ffffff;
+  --dark-text-secondary: #b0bec5;
+  --dark-background-default: #1e2738;
+  --dark-background-paper: #273142;
+  --dark-divider-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Main container */
+.chess-timer {
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.dark-mode .chess-timer {
+  background-color: rgba(30, 32, 35, 0.9);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Header section */
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  background-color: rgba(98, 129, 208, 0.05);
+}
+
+.dark-mode .timer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(39, 49, 66, 0.4);
+}
+
+/* Header title */
+.timer-header-title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  color: var(--primary-main);
+}
+
+.timer-header-title i,
+.timer-header-title svg {
+  margin-right: 0.25rem;
+}
+
+.dark-mode .timer-header-title {
+  color: var(--dark-primary-main);
+}
+
+/* Status chip */
+.status-chip {
+  border-radius: 12px;
+  padding: 0.25rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.status-chip i,
+.status-chip svg {
+  margin-right: 0.25rem;
+  font-size: 1rem;
+}
+
+.status-chip.running {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.status-chip.paused {
+  background-color: rgba(158, 158, 158, 0.1);
+  color: #9e9e9e;
+  border: 1px solid rgba(158, 158, 158, 0.2);
+}
+
+/* Timers container */
+.timers-container {
+  padding: 0.75rem;
+}
+
+/* Timers layout */
+.timers-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+/* White player timer */
+.player-timer {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  width: 50%;
+  transition: all 0.3s ease;
+}
+
+/* Active player timer */
+.player-timer.active {
+  transform: scale(1) translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.player-timer.inactive {
+  transform: scale(0.98) translateY(0);
+  opacity: 0.95;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* White player timer */
+.player-timer.white.active {
+  background-color: rgba(98, 129, 208, 0.15);
+  border: 1px solid rgba(58, 93, 174, 0.2);
+}
+
+.player-timer.white.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--primary-main),
+    var(--primary-light)
+  );
+}
+
+/* Black player timer */
+.player-timer.black.active {
+  background-color: rgba(242, 189, 110, 0.15);
+  border: 1px solid rgba(224, 158, 69, 0.2);
+}
+
+.player-timer.black.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--secondary-main),
+    var(--secondary-light)
+  );
+}
+
+/* Dark mode active timers */
+.dark-mode .player-timer.white.active {
+  background-color: rgba(77, 130, 229, 0.1);
+  border: 1px solid rgba(77, 130, 229, 0.2);
+}
+
+.dark-mode .player-timer.black.active {
+  background-color: rgba(255, 183, 77, 0.1);
+  border: 1px solid rgba(255, 183, 77, 0.2);
+}
+
+.dark-mode .player-timer.white.active::before {
+  background: linear-gradient(
+    to right,
+    var(--dark-primary-main),
+    var(--dark-primary-light)
+  );
+}
+
+.dark-mode .player-timer.black.active::before {
+  background: linear-gradient(
+    to right,
+    var(--dark-secondary-main),
+    var(--dark-secondary-light)
+  );
+}
+
+/* Player label */
+.player-label {
+  font-weight: 600;
+  color: rgba(84, 110, 122, 0.9);
+  margin-bottom: 0.25rem;
+}
+
+.dark-mode .player-label {
+  color: rgba(176, 190, 197, 0.9);
+}
+
+/* Timer display */
+.timer-display {
+  font-family: "Roboto Mono", monospace;
+  font-weight: bold;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+  color: var(--primary-main);
+  transition: color 0.5s ease, text-shadow 0.5s ease;
+}
+
+/* Timer colors based on remaining time */
+.timer-display.warning {
+  color: var(--warning-main);
+}
+
+.timer-display.danger {
+  color: var(--error-main);
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+}
+
+.dark-mode .timer-display {
+  color: var(--dark-primary-main);
+}
+
+.dark-mode .timer-display.warning {
+  color: var(--dark-warning-main);
+}
+
+.dark-mode .timer-display.danger {
+  color: var(--dark-error-main);
+}
+
+/* Increment chip */
+.increment-chip {
+  margin-top: 0.25rem;
+  height: 20px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  padding: 0 0.5rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.white .increment-chip {
+  border: 1px solid var(--primary-main);
+  color: var(--primary-main);
+  background-color: rgba(58, 93, 174, 0.05);
+}
+
+.black .increment-chip {
+  border: 1px solid var(--secondary-main);
+  color: var(--secondary-main);
+  background-color: rgba(224, 158, 69, 0.05);
+}
+
+/* Spring animation can be implemented with CSS animations if needed */
+@keyframes spring-up {
+  0% {
+    transform: translateY(0) scale(0.98);
+  }
+  40% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  70% {
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    transform: translateY(-3px) scale(1);
+  }
+}
+
+@keyframes spring-down {
+  0% {
+    transform: translateY(0) scale(0.98);
+  }
+  40% {
+    transform: translateY(5px) scale(1.02);
+  }
+  70% {
+    transform: translateY(2px) scale(1.01);
+  }
+  100% {
+    transform: translateY(3px) scale(1);
+  }
+}
+
+.player-timer.white.active {
+  animation: spring-up 0.4s ease forwards;
+}
+
+.player-timer.black.active {
+  animation: spring-down 0.4s ease forwards;
+}
+
+/* Optional: Media Queries for Responsive Design */
+@media (max-width: 600px) {
+  .timer-display {
+    font-size: 1.5rem;
+  }
+
+  .player-timer {
+    padding: 0.5rem;
+  }
+
+  .timers-layout {
+    flex-direction: column;
+  }
+
+  .player-timer {
+    width: 100%;
+  }
+}

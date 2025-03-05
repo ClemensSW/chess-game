@@ -5,7 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { motion } from "framer-motion";
-import { styles, formatTime, getTimerColor } from "./ChessTimer.styles";
+import { styles, formatTime } from "./ChessTimer.styles";
 
 /**
  * Chess Timer Component

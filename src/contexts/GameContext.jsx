@@ -114,12 +114,20 @@ export const GameProvider = ({ children }) => {
     const isComputerMode = appSettings.gameMode === "computer";
     const isComputerTurn = currentPlayer === "b"; // Computer always plays as black
 
+    console.log("Computer-Zug Prüfung:", {
+      isComputerMode,
+      isComputerTurn,
+      gameStarted,
+      gameEndState: !!gameEndState,
+      boardRefExists: !!boardRef.current,
+    });
+
     if (
       isComputerMode &&
       isComputerTurn &&
       gameStarted &&
       !gameEndState &&
-      computerPlayerRef.current
+      boardRef.current // Stelle sicher, dass wir eine Referenz zum Brett haben
     ) {
       // Add a small delay for better UX
       setIsComputerThinking(true);
@@ -128,33 +136,47 @@ export const GameProvider = ({ children }) => {
 
       const timerId = setTimeout(() => {
         try {
-          // Make the computer move
-          const move = computerPlayerRef.current.makeMove();
+          // Hole die aktuelle Spielinstanz direkt vom Brett
+          const currentGame = boardRef.current.getGame
+            ? boardRef.current.getGame()
+            : game;
+
+          console.log(
+            "Computer macht Zug mit aktuellem Spielstand:",
+            currentGame.fen()
+          );
+
+          // Erstelle einen neuen Computer-Spieler mit dem aktuellen Spielstand
+          const computerPlayer = new ComputerPlayer(
+            currentGame,
+            appSettings.computerDifficulty
+          );
+
+          // Führe den Computer-Zug direkt auf der Spiel-Instanz des Bretts aus
+          const move = computerPlayer.makeMove();
+          console.log("Computer hat Zug ausgeführt:", move);
 
           if (move) {
-            // Update move history
-            setMoves((prev) => [...prev, move]);
+            // Aktualisiere den Zugverlauf
+            const formattedMove =
+              typeof move === "string" ? move : move.san || move.toString();
+            setMoves((prev) => [...prev, formattedMove]);
             setCurrentMoveIndex((prev) => prev + 1);
 
-            // Switch player
+            // Wechsle den Spieler
             setCurrentPlayer("w");
 
-            // Update game statistics
+            // Aktualisiere Spielstatistiken
             updateGameStatsAfterMove(move);
 
-            // Update board visualization if needed - the board should
-            // automatically update when the game state changes, but we can
-            // explicitly update the position if we have a specific FEN
-            if (boardRef.current && boardRef.current.getFEN) {
-              const currentFEN = game.fen();
-              boardRef.current.loadPosition(currentFEN, moves);
-            }
+            // Aktualisiere die Spielinstanz im Kontext
+            setGame(new Chess(currentGame.fen()));
 
-            // Check for game end
+            // Prüfe auf Spielende
             checkGameEnd();
           }
         } catch (error) {
-          console.error("Error making computer move:", error);
+          console.error("Fehler beim Computer-Zug:", error);
         } finally {
           setIsComputerThinking(false);
         }
@@ -162,7 +184,14 @@ export const GameProvider = ({ children }) => {
 
       return () => clearTimeout(timerId);
     }
-  }, [currentPlayer, gameStarted, gameEndState, appSettings.gameMode]);
+  }, [
+    currentPlayer,
+    gameStarted,
+    gameEndState,
+    appSettings.gameMode,
+    appSettings.computerDifficulty,
+    game,
+  ]);
 
   // Helper to update game stats after a move
   const updateGameStatsAfterMove = (move) => {
@@ -198,25 +227,35 @@ export const GameProvider = ({ children }) => {
   // Callback for move changes from the chess board
   const handleMoveChange = useCallback(
     (moveHistory, capturedPiece, isCheck) => {
-      // Format moves
+      // Format moves - stelle sicher, dass wir das vollständige Zugobjekt haben
       const formattedMoves = moveHistory.map((move) =>
         typeof move === "string" ? move : move.san || move.toString()
+      );
+
+      // Hole den letzten Zug, um ihn später zu analysieren
+      const latestMove = moveHistory[moveHistory.length - 1];
+
+      console.log(
+        "Zug ausgeführt:",
+        latestMove,
+        "Nächster Spieler:",
+        currentPlayer === "w" ? "b" : "w"
       );
 
       setMoves(formattedMoves);
       setCurrentMoveIndex(formattedMoves.length - 1);
 
-      // Switch player
+      // Wechsle den Spieler
       setCurrentPlayer((prev) => (prev === "w" ? "b" : "w"));
 
-      // Update game statistics
+      // Aktualisiere Spielstatistiken
       setGameStats((prev) => {
         const updatedStats = {
           ...prev,
           moveCount: prev.moveCount + 1,
         };
 
-        // Add captured piece if any
+        // Füge geschlagene Figur hinzu, falls vorhanden
         if (capturedPiece) {
           const captureList = capturedPiece.color === "w" ? "white" : "black";
           updatedStats.capturedPieces = {
@@ -225,29 +264,43 @@ export const GameProvider = ({ children }) => {
           };
         }
 
-        // Count checks
+        // Zähle Schachs
         if (isCheck) {
           updatedStats.checks = prev.checks + 1;
         }
 
         return updatedStats;
       });
+
+      // Aktualisiere das Spielobjekt im Kontext, falls das Brett eine getGame-Funktion hat
+      if (boardRef.current && boardRef.current.getGame) {
+        const updatedGame = boardRef.current.getGame();
+        setGame(new Chess(updatedGame.fen()));
+      }
     },
-    []
+    [currentPlayer]
   );
 
   // Start a new game
   const handleNewGame = useCallback(() => {
+    console.log("Starte neues Spiel im Modus:", appSettings.gameMode);
+
     if (boardRef.current) {
       boardRef.current.newGame();
+      // Aktualisiere auch die Spiel-Instanz im Kontext
+      if (boardRef.current.getGame) {
+        setGame(boardRef.current.getGame());
+      }
     } else {
-      setGame(new Chess());
-      setMoves([]);
-      setCurrentMoveIndex(-1);
-      setCurrentPlayer("w");
+      const newGame = new Chess();
+      setGame(newGame);
     }
 
-    // Reset game statistics
+    setMoves([]);
+    setCurrentMoveIndex(-1);
+    setCurrentPlayer("w");
+
+    // Setze Spielstatistiken zurück
     setGameStats({
       startTime: Date.now(),
       moveCount: 0,
@@ -258,20 +311,14 @@ export const GameProvider = ({ children }) => {
       checks: 0,
     });
 
-    // Reset game end state
+    // Setze Spielendezustand zurück
     setGameEndState(null);
 
-    // Initialize computer player if in computer mode
-    if (appSettings.gameMode === "computer") {
-      computerPlayerRef.current = new ComputerPlayer(
-        game,
-        appSettings.computerDifficulty
-      );
-    }
-
-    // Mark game as started (hide the selection overlay)
+    // Markiere Spiel als gestartet (verstecke den Auswahlbildschirm)
     setGameStarted(true);
-  }, [appSettings.gameMode, appSettings.computerDifficulty]);
+
+    console.log("Neues Spiel gestartet, gameStarted =", true);
+  }, [appSettings.gameMode]);
 
   // Undo move
   const handleUndoMove = useCallback(() => {

@@ -1,7 +1,6 @@
 // src/components/ChessSquare.jsx - Optimierte Version
 import React from "react";
-import { Grid, Box, Typography } from "@mui/material";
-import { motion } from "framer-motion";
+import { Grid2, Box, Typography } from "@mui/material";
 
 const ChessSquare = ({
   piece,
@@ -22,7 +21,6 @@ const ChessSquare = ({
   pieceStyle = "standard",
   showCoordinates = true,
   orientation = "white",
-  animationSpeed = 2,
 }) => {
   const isDark = (row + col) % 2 === 1;
 
@@ -244,7 +242,7 @@ const ChessSquare = ({
   };
 
   return (
-    <Grid item xs={1.5} sx={{ width: "12.5%", height: "12.5%" }}>
+    <Grid2 item xs={1.5} sx={{ width: "12.5%", height: "12.5%" }}>
       <Box
         onClick={onClick}
         onMouseEnter={() => onHover && onHover(squareNotation)}
@@ -275,7 +273,7 @@ const ChessSquare = ({
         {renderCoordinate()}
         {renderPiece()}
       </Box>
-    </Grid>
+    </Grid2>
   );
 };
 

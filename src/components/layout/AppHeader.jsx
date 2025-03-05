@@ -54,6 +54,7 @@ const AppHeader = ({
                 theme.palette.primary.dark,
                 0.85
               )})`,
+        borderRadius: 0,
         borderBottom: (theme) =>
           `1px solid ${alpha(theme.palette.primary.dark, 0.1)}`,
         backdropFilter: "blur(8px)",

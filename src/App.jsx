@@ -2,11 +2,12 @@
 import React, { useState } from "react";
 import {
   Container,
-  Grid,
+  Grid2,
   CssBaseline,
   useMediaQuery,
   Box,
   alpha,
+  Button,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -41,6 +42,10 @@ function AppContent() {
     appSettings,
     handleApplySettings,
     gameStarted, // Get if game has started from context
+    boardRef,
+    moves,
+    currentPlayer,
+    isComputerThinking,
   } = useGame();
 
   // Media queries for responsive layout
@@ -127,17 +132,41 @@ function AppContent() {
           mb: 4,
         }}
       >
-        <Grid container spacing={3}>
+        <Grid2 sx={{ flexGrow: 1 }} container spacing={3}>
           {/* Chess Board */}
-          <Grid item xs={12} md={8} lg={8}>
+          <Grid2 item xs={12} md={8} lg={8}>
             <ChessBoardContainer isMobile={isMobile} />
-          </Grid>
+
+            {/* Debug Button (nur im Entwicklungsmodus sichtbar) */}
+            {import.meta.env?.DEV && (
+              <Box sx={{ mt: 2, textAlign: "center" }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  onClick={() => {
+                    console.log("Debug-Info:", {
+                      gameMode: appSettings.gameMode,
+                      gameStarted,
+                      currentPlayer,
+                      gameEndState,
+                      boardGame: boardRef.current?.getGame()?.fen(),
+                      movesHistory: moves,
+                      isComputerThinking,
+                    });
+                  }}
+                >
+                  Debug-Info
+                </Button>
+              </Box>
+            )}
+          </Grid2>
 
           {/* Sidebar Controls */}
-          <Grid item xs={12} md={4} lg={4}>
+          <Grid2 item xs={12} md={4} lg={4}>
             <SidebarControls />
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
 
         {/* Footer */}
         <AppFooter />
